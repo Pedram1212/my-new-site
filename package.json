@@ -1,0 +1,13 @@
+{
+  "name": "sabke-german-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sabke German (سبک ژرمن) — Multilingual Educational Migration & Study-Abroad Agency Website (FA, DE, EN, AZ)",
+  "scripts": {
+    "build": "python3 build_site.py",
+    "dev": "python3 -m http.server 3000"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
