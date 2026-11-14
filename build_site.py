@@ -16,6 +16,7 @@ Generates:
 import json
 import os
 from html import escape
+from urllib.parse import quote
 from i18n.translations import SITE_CONFIG, TRANSLATIONS
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -77,6 +78,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
     domain = SITE_CONFIG["domain"]
     canonical_url = domain if is_root else f"{domain}/{lang_code}"
     active_tab = d["pathways"]["tabs"][0]
+    wa_direct_url = f"https://wa.me/{SITE_CONFIG['whatsapp_number']}?text={quote(d['contact']['whatsapp_greeting'])}"
 
     # Pre-render pathway tabs
     pathway_tabs_html = "\n".join(
@@ -302,6 +304,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
         <a href="#pricing" class="nav-link" data-i18n="nav.pricing">{escape(d['nav']['pricing'])}</a>
         <a href="#stories" class="nav-link" data-i18n="nav.stories">{escape(d['nav']['stories'])}</a>
         <a href="#faq" class="nav-link" data-i18n="nav.faq">{escape(d['nav']['faq'])}</a>
+        <a href="#contact" class="nav-link" data-i18n="nav.contact">{escape(d['nav']['contact'])}</a>
       </nav>
 
       <div class="header-controls">
@@ -622,6 +625,162 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
         </div>
       </div>
     </section>
+
+    <!-- ======================================================================
+         H. CONTACT, CONSULTATION & PDF DOCUMENT UPLOAD SECTION
+         ====================================================================== -->
+    <section class="section contact-section" id="contact">
+      <div class="container">
+        <div class="section-header">
+          <div class="eyebrow" data-i18n="contact.eyebrow">{escape(d['contact']['eyebrow'])}</div>
+          <h2 class="section-title" data-i18n="contact.title">{escape(d['contact']['title'])}</h2>
+          <p class="section-subtitle" data-i18n="contact.subtitle">{escape(d['contact']['subtitle'])}</p>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Direct WhatsApp & Berlin Advisory Card -->
+          <aside class="contact-direct-card">
+            <div>
+              <div class="wa-status-pill">
+                <span class="wa-status-dot" aria-hidden="true"></span>
+                <span data-i18n="contact.wa_card_badge">{escape(d['contact']['wa_card_badge'])}</span>
+              </div>
+              <h3 class="contact-direct-title" data-i18n="contact.info_card_title">{escape(d['contact']['info_card_title'])}</h3>
+              <p class="contact-direct-desc" data-i18n="contact.info_card_desc">{escape(d['contact']['info_card_desc'])}</p>
+
+              <a href="{wa_direct_url}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg contact-wa-main-btn" id="contact-direct-wa-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.359 5.016L2 22l5.156-1.359c1.484.813 3.172 1.25 4.875 1.25 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2zm5.828 14.125c-.25.703-1.453 1.344-2.016 1.422-.531.078-1.203.109-1.953-.125-.453-.141-1.047-.344-1.797-.672-3.156-1.359-5.219-4.547-5.375-4.766-.156-.203-1.281-1.703-1.281-3.25s.813-2.313 1.094-2.625c.281-.313.625-.391.828-.391.203 0 .406.016.594.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.031.547-.094.203-.141.328-.297.5-.156.172-.313.391-.453.516-.141.141-.297.297-.125.594.172.297.766 1.266 1.641 2.047 1.125 1.016 2.078 1.328 2.375 1.484.297.156.469.125.641-.078.172-.203.75-.875.953-1.172.203-.297.406-.25.688-.141.281.109 1.766.828 2.063.984.297.156.5.234.578.359.078.125.078.734-.172 1.438z"/>
+                </svg>
+                <span data-i18n="contact.wa_cta_btn">{escape(d['contact']['wa_cta_btn'])}</span>
+              </a>
+            </div>
+
+            <div class="contact-info-list">
+              <div class="contact-info-item">
+                <span class="contact-info-icon">🇩🇪</span>
+                <div>
+                  <div class="contact-info-label">Berlin Headquarters</div>
+                  <div class="contact-info-val">{escape(SITE_CONFIG['address_berlin'])}</div>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <span class="contact-info-icon">📞</span>
+                <div>
+                  <div class="contact-info-label">WhatsApp &amp; Direct Line</div>
+                  <div class="contact-info-val" dir="ltr">+49 000 0000000 • {escape(SITE_CONFIG['phone_de'])}</div>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <span class="contact-info-icon">✉️</span>
+                <div>
+                  <div class="contact-info-label">Official Admissions Desk</div>
+                  <div class="contact-info-val" dir="ltr">{escape(SITE_CONFIG['email'])}</div>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <span class="contact-info-icon">🕒</span>
+                <div>
+                  <div class="contact-info-label" data-i18n="contact.office_hours_label">{escape(d['contact']['office_hours_label'])}</div>
+                  <div class="contact-info-val" data-i18n="contact.office_hours_val">{escape(d['contact']['office_hours_val'])}</div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Consultation Request & PDF Document Upload Form -->
+          <div class="contact-form-card">
+            <h3 class="contact-form-heading" data-i18n="contact.form_title">{escape(d['contact']['form_title'])}</h3>
+
+            <form id="contact-consultation-form" class="consultation-form" action="{escape(SITE_CONFIG['form_endpoint'])}" method="POST" enctype="multipart/form-data" novalidate>
+              <div class="contact-form-row">
+                <div class="contact-field-group">
+                  <label class="contact-label" for="contact-name" data-i18n="contact.name_label">{escape(d['contact']['name_label'])}</label>
+                  <input type="text" id="contact-name" name="full_name" class="contact-input" required placeholder="{escape(d['contact']['name_placeholder'])}" data-i18n-placeholder="contact.name_placeholder" autocomplete="name" />
+                </div>
+                <div class="contact-field-group">
+                  <label class="contact-label" for="contact-email" data-i18n="contact.email_label">{escape(d['contact']['email_label'])}</label>
+                  <input type="email" id="contact-email" name="email" class="contact-input" required dir="ltr" placeholder="{escape(d['contact']['email_placeholder'])}" data-i18n-placeholder="contact.email_placeholder" autocomplete="email" />
+                </div>
+              </div>
+
+              <div class="contact-form-row">
+                <div class="contact-field-group">
+                  <label class="contact-label" for="contact-phone" data-i18n="contact.phone_label">{escape(d['contact']['phone_label'])}</label>
+                  <input type="tel" id="contact-phone" name="whatsapp_phone" class="contact-input" required dir="ltr" placeholder="{escape(d['contact']['phone_placeholder'])}" data-i18n-placeholder="contact.phone_placeholder" autocomplete="tel" />
+                </div>
+                <div class="contact-field-group">
+                  <label class="contact-label" for="contact-pathway" data-i18n="contact.pathway_label">{escape(d['contact']['pathway_label'])}</label>
+                  <select id="contact-pathway" name="target_pathway" class="contact-select" required>
+                    <option value="Studienkolleg" data-i18n="contact.pathway_options.studienkolleg">{escape(d['contact']['pathway_options']['studienkolleg'])}</option>
+                    <option value="Bachelor" data-i18n="contact.pathway_options.bachelor">{escape(d['contact']['pathway_options']['bachelor'])}</option>
+                    <option value="Master" selected data-i18n="contact.pathway_options.master">{escape(d['contact']['pathway_options']['master'])}</option>
+                    <option value="Ausbildung" data-i18n="contact.pathway_options.ausbildung">{escape(d['contact']['pathway_options']['ausbildung'])}</option>
+                    <option value="Language Course" data-i18n="contact.pathway_options.language">{escape(d['contact']['pathway_options']['language'])}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="contact-field-group">
+                <label class="contact-label" for="contact-message" data-i18n="contact.message_label">{escape(d['contact']['message_label'])}</label>
+                <textarea id="contact-message" name="message" rows="4" class="contact-input contact-textarea" placeholder="{escape(d['contact']['message_placeholder'])}" data-i18n-placeholder="contact.message_placeholder"></textarea>
+              </div>
+
+              <!-- Styled PDF Document Upload Field (Max 10MB, .pdf only) -->
+              <div class="contact-field-group">
+                <label class="contact-label" for="contact-pdf-input" data-i18n="contact.pdf_label">{escape(d['contact']['pdf_label'])}</label>
+                <div class="pdf-upload-wrapper">
+                  <input type="file" id="contact-pdf-input" name="document_pdf" accept=".pdf,application/pdf" class="pdf-file-input-hidden" aria-describedby="contact-pdf-hint contact-pdf-error" />
+                  <label for="contact-pdf-input" class="pdf-dropzone" id="contact-pdf-dropzone">
+                    <div class="pdf-dropzone-icon" aria-hidden="true">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <path d="M12 18v-6"></path>
+                        <path d="m9 15 3-3 3 3"></path>
+                      </svg>
+                    </div>
+                    <div class="pdf-dropzone-text">
+                      <span class="pdf-drop-title" data-i18n="contact.pdf_drop_title">{escape(d['contact']['pdf_drop_title'])}</span>
+                      <span class="pdf-drop-hint" id="contact-pdf-hint" data-i18n="contact.pdf_drop_hint">{escape(d['contact']['pdf_drop_hint'])}</span>
+                    </div>
+                  </label>
+
+                  <div class="pdf-selected-bar" id="contact-pdf-selected" hidden>
+                    <div class="pdf-selected-info">
+                      <span class="pdf-badge-icon" aria-hidden="true">📄 PDF</span>
+                      <span class="pdf-filename" id="contact-pdf-filename" dir="ltr"></span>
+                      <span class="pdf-filesize" id="contact-pdf-filesize" dir="ltr"></span>
+                    </div>
+                    <button type="button" class="pdf-remove-btn" id="contact-pdf-remove" data-i18n="contact.pdf_remove_btn">{escape(d['contact']['pdf_remove_btn'])}</button>
+                  </div>
+
+                  <div class="pdf-error-msg" id="contact-pdf-error" role="alert" hidden></div>
+                </div>
+              </div>
+
+              <!-- Submit & Direct WhatsApp CTA Row -->
+              <div class="contact-form-actions">
+                <button type="submit" class="btn btn-primary btn-lg contact-submit-btn" id="contact-submit-btn">
+                  <span data-i18n="contact.submit_btn">{escape(d['contact']['submit_btn'])}</span>
+                </button>
+                <a href="{wa_direct_url}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-lg contact-wa-inline-btn" id="contact-form-wa-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.359 5.016L2 22l5.156-1.359c1.484.813 3.172 1.25 4.875 1.25 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2zm5.828 14.125c-.25.703-1.453 1.344-2.016 1.422-.531.078-1.203.109-1.953-.125-.453-.141-1.047-.344-1.797-.672-3.156-1.359-5.219-4.547-5.375-4.766-.156-.203-1.281-1.703-1.281-3.25s.813-2.313 1.094-2.625c.281-.313.625-.391.828-.391.203 0 .406.016.594.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.031.547-.094.203-.141.328-.297.5-.156.172-.313.391-.453.516-.141.141-.297.297-.125.594.172.297.766 1.266 1.641 2.047 1.125 1.016 2.078 1.328 2.375 1.484.297.156.469.125.641-.078.172-.203.75-.875.953-1.172.203-.297.406-.25.688-.141.281.109 1.766.828 2.063.984.297.156.5.234.578.359.078.125.078.734-.172 1.438z"/>
+                  </svg>
+                  <span data-i18n="contact.direct_wa_btn">{escape(d['contact']['direct_wa_btn'])}</span>
+                </a>
+              </div>
+
+              <!-- Smooth Submission Feedback Message -->
+              <div class="contact-feedback-banner" id="contact-form-feedback" role="status" aria-live="polite" hidden></div>
+
+              <p class="contact-privacy-note" data-i18n="contact.privacy_note">{escape(d['contact']['privacy_note'])}</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ========================================================================
@@ -658,6 +817,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
             <a href="#roadmap" data-i18n="nav.roadmap">{escape(d['nav']['roadmap'])}</a>
             <a href="#pricing" data-i18n="nav.pricing">{escape(d['nav']['pricing'])}</a>
             <a href="#faq" data-i18n="nav.faq">{escape(d['nav']['faq'])}</a>
+            <a href="#contact" data-i18n="nav.contact">{escape(d['nav']['contact'])}</a>
           </div>
         </div>
 
@@ -704,7 +864,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
        ======================================================================== -->
   <div class="floating-consult-widget" id="floating-consult-widget">
     <div class="floating-channels">
-      <a href="https://wa.me/{SITE_CONFIG['whatsapp_number']}?text=Hello%20Sabke%20German%2C%20I%20would%20like%20a%20study%20consultation." target="_blank" rel="noopener noreferrer" class="channel-link" id="floating-wa-link">
+      <a href="{wa_direct_url}" target="_blank" rel="noopener noreferrer" class="channel-link" id="floating-wa-link">
         <span>💬</span>
         <span data-i18n="floating.whatsapp">{escape(d['floating']['whatsapp'])}</span>
       </a>
@@ -712,15 +872,22 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
         <span>✈️</span>
         <span data-i18n="floating.telegram">{escape(d['floating']['telegram'])}</span>
       </a>
-      <button type="button" class="channel-link" data-open-modal="consult-modal" id="floating-book-link">
-        <span>📅</span>
+      <a href="#contact" class="channel-link" id="floating-book-link">
+        <span>📄</span>
         <span data-i18n="floating.book">{escape(d['floating']['book'])}</span>
+      </a>
+    </div>
+    <div class="floating-bar-row">
+      <a href="{wa_direct_url}" target="_blank" rel="noopener noreferrer" class="floating-wa-quick-btn" id="floating-wa-quick-btn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.359 5.016L2 22l5.156-1.359c1.484.813 3.172 1.25 4.875 1.25 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2zm5.828 14.125c-.25.703-1.453 1.344-2.016 1.422-.531.078-1.203.109-1.953-.125-.453-.141-1.047-.344-1.797-.672-3.156-1.359-5.219-4.547-5.375-4.766-.156-.203-1.281-1.703-1.281-3.25s.813-2.313 1.094-2.625c.281-.313.625-.391.828-.391.203 0 .406.016.594.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.031.547-.094.203-.141.328-.297.5-.156.172-.313.391-.453.516-.141.141-.297.297-.125.594.172.297.766 1.266 1.641 2.047 1.125 1.016 2.078 1.328 2.375 1.484.297.156.469.125.641-.078.172-.203.75-.875.953-1.172.203-.297.406-.25.688-.141.281.109 1.766.828 2.063.984.297.156.5.234.578.359.078.125.078.734-.172 1.438z"/>
+        </svg>
+        <span data-i18n="floating.launcher">{escape(d['floating']['launcher'])}</span>
+      </a>
+      <button type="button" class="floating-more-btn" id="floating-launcher-btn" aria-label="More Contact Channels" title="More Channels">
+        <span>▾</span>
       </button>
     </div>
-    <button type="button" class="floating-Launcher-btn" id="floating-launcher-btn">
-      <span>💬</span>
-      <span data-i18n="floating.launcher">{escape(d['floating']['launcher'])}</span>
-    </button>
   </div>
 
   <!-- ========================================================================

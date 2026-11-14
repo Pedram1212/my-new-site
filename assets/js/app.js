@@ -642,6 +642,34 @@
         .join('');
     }
 
+    // Update localized WhatsApp direct links (floating button + contact section buttons)
+    if (dict.contact && dict.contact.whatsapp_greeting && window.SABKE_CONFIG) {
+      const waUrl = `https://wa.me/${window.SABKE_CONFIG.whatsapp_number}?text=${encodeURIComponent(
+        dict.contact.whatsapp_greeting
+      )}`;
+      ['floating-wa-quick-btn', 'floating-wa-link', 'contact-direct-wa-btn', 'contact-form-wa-btn'].forEach(
+        (id) => {
+          const el = document.getElementById(id);
+          if (el) el.setAttribute('href', waUrl);
+        }
+      );
+    }
+
+    // Refresh active PDF error or form feedback banner text if visible when language switches
+    const pdfErrEl = document.getElementById('contact-pdf-error');
+    if (pdfErrEl && pdfErrEl.style.display !== 'none' && dict.contact) {
+      const errType = pdfErrEl.getAttribute('data-err-type');
+      if (errType === 'type') pdfErrEl.textContent = dict.contact.pdf_err_type;
+      else if (errType === 'size') pdfErrEl.textContent = dict.contact.pdf_err_size;
+    }
+
+    const feedbackEl = document.getElementById('contact-form-feedback');
+    if (feedbackEl && feedbackEl.style.display !== 'none' && dict.contact) {
+      const fbState = feedbackEl.getAttribute('data-fb-state');
+      if (fbState === 'success') feedbackEl.textContent = dict.contact.feedback_success;
+      else if (fbState === 'error') feedbackEl.textContent = dict.contact.feedback_error;
+    }
+
     if (pushUrl && window.history && window.history.replaceState) {
       const url = new URL(window.location.href);
       url.searchParams.set('lang', lang);
@@ -858,7 +886,7 @@
       }
     });
 
-    // Consultation Form Submit (WhatsApp & Email)
+    // Consultation Modal Form Submit (WhatsApp & Email)
     const consultWaBtn = document.getElementById('consult-submit-wa');
     const consultEmailBtn = document.getElementById('consult-submit-email');
 
@@ -885,6 +913,204 @@
       consultEmailBtn.addEventListener('click', () => {
         const text = getConsultPayload();
         window.location.href = `mailto:${window.SABKE_CONFIG.email}?subject=${encodeURIComponent('Consultation Request — Sabke German')}&body=${encodeURIComponent(text)}`;
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // Contact & Consultation Section: PDF Upload Validation & Form Submission
+    // ------------------------------------------------------------------------
+    const pdfInput = document.getElementById('contact-pdf-input');
+    const pdfDropzone = document.getElementById('contact-pdf-dropzone');
+    const pdfSelectedBar = document.getElementById('contact-pdf-selected');
+    const pdfFilenameEl = document.getElementById('contact-pdf-filename');
+    const pdfFilesizeEl = document.getElementById('contact-pdf-filesize');
+    const pdfRemoveBtn = document.getElementById('contact-pdf-remove');
+    const pdfErrorEl = document.getElementById('contact-pdf-error');
+    const contactForm = document.getElementById('contact-consultation-form');
+    const contactFeedback = document.getElementById('contact-form-feedback');
+
+    const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    function clearPdfSelection(clearErrors = true) {
+      if (pdfInput) pdfInput.value = '';
+      if (pdfSelectedBar) pdfSelectedBar.style.display = 'none';
+      if (pdfFilenameEl) pdfFilenameEl.textContent = '';
+      if (pdfFilesizeEl) pdfFilesizeEl.textContent = '';
+      if (pdfDropzone) pdfDropzone.classList.remove('has-file');
+      if (clearErrors && pdfErrorEl) {
+        pdfErrorEl.style.display = 'none';
+        pdfErrorEl.textContent = '';
+        pdfErrorEl.removeAttribute('data-err-type');
+      }
+      if (clearErrors && pdfDropzone) {
+        pdfDropzone.classList.remove('has-error');
+      }
+    }
+
+    function showPdfError(errType) {
+      const dict = window.SABKE_I18N?.[state.lang]?.contact || {};
+      const msg =
+        errType === 'type'
+          ? dict.pdf_err_type || 'Only PDF files (.pdf) are allowed.'
+          : dict.pdf_err_size || 'File size exceeds the 10 MB limit.';
+      clearPdfSelection(false);
+      if (pdfDropzone) pdfDropzone.classList.add('has-error');
+      if (pdfErrorEl) {
+        pdfErrorEl.setAttribute('data-err-type', errType);
+        pdfErrorEl.textContent = msg;
+        pdfErrorEl.style.display = 'block';
+      }
+    }
+
+    function validateAndDisplayPdf(file) {
+      if (!file) {
+        clearPdfSelection(true);
+        return true;
+      }
+      const isPdfMime = file.type === 'application/pdf';
+      const isPdfExt = file.name && file.name.toLowerCase().endsWith('.pdf');
+      if (!isPdfMime && !isPdfExt) {
+        showPdfError('type');
+        return false;
+      }
+      if (file.size > MAX_PDF_BYTES) {
+        showPdfError('size');
+        return false;
+      }
+      // Valid PDF file
+      if (pdfErrorEl) {
+        pdfErrorEl.style.display = 'none';
+        pdfErrorEl.textContent = '';
+        pdfErrorEl.removeAttribute('data-err-type');
+      }
+      if (pdfDropzone) {
+        pdfDropzone.classList.remove('has-error');
+        pdfDropzone.classList.add('has-file');
+      }
+      if (pdfFilenameEl) pdfFilenameEl.textContent = file.name;
+      if (pdfFilesizeEl) pdfFilesizeEl.textContent = `(${formatFileSize(file.size)})`;
+      if (pdfSelectedBar) pdfSelectedBar.style.display = 'flex';
+      return true;
+    }
+
+    if (pdfInput) {
+      pdfInput.addEventListener('change', () => {
+        const file = pdfInput.files && pdfInput.files[0];
+        validateAndDisplayPdf(file);
+      });
+    }
+
+    if (pdfRemoveBtn) {
+      pdfRemoveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        clearPdfSelection(true);
+      });
+    }
+
+    if (pdfDropzone && pdfInput) {
+      ['dragenter', 'dragover'].forEach((evtName) => {
+        pdfDropzone.addEventListener(evtName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          pdfDropzone.classList.add('drag-over');
+        });
+      });
+      ['dragleave', 'drop'].forEach((evtName) => {
+        pdfDropzone.addEventListener(evtName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          pdfDropzone.classList.remove('drag-over');
+        });
+      });
+      pdfDropzone.addEventListener('drop', (e) => {
+        const droppedFiles = e.dataTransfer?.files;
+        if (droppedFiles && droppedFiles.length > 0) {
+          const file = droppedFiles[0];
+          if (validateAndDisplayPdf(file)) {
+            try {
+              const dt = new DataTransfer();
+              dt.items.add(file);
+              pdfInput.files = dt.files;
+            } catch (_) {
+              // Fallback if DataTransfer assignment is unsupported
+            }
+          }
+        }
+      });
+    }
+
+    if (contactForm) {
+      contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dict = window.SABKE_I18N?.[state.lang]?.contact || {};
+        const nameVal = (document.getElementById('contact-name')?.value || '').trim();
+        const emailVal = (document.getElementById('contact-email')?.value || '').trim();
+        const phoneVal = (document.getElementById('contact-phone')?.value || '').trim();
+
+        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+        if (!nameVal || !emailValid || !phoneVal) {
+          if (contactFeedback) {
+            contactFeedback.className = 'contact-feedback-banner error';
+            contactFeedback.setAttribute('data-fb-state', 'error');
+            contactFeedback.textContent =
+              dict.feedback_error || 'Please complete all required fields with valid information.';
+            contactFeedback.style.display = 'block';
+          }
+          return;
+        }
+
+        // Validate PDF file if one is selected
+        const file = pdfInput?.files?.[0];
+        if (file && !validateAndDisplayPdf(file)) {
+          return;
+        }
+
+        const actionUrl = contactForm.getAttribute('action') || 'YOUR_FORM_ENDPOINT_URL';
+        const submitBtn = document.getElementById('contact-submit-btn');
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+          if (actionUrl && actionUrl !== 'YOUR_FORM_ENDPOINT_URL') {
+            const formData = new FormData(contactForm);
+            await fetch(actionUrl, {
+              method: 'POST',
+              body: formData,
+              headers: { Accept: 'application/json' },
+            });
+          } else {
+            // Smooth simulated submission when using placeholder endpoint
+            await new Promise((resolve) => setTimeout(resolve, 450));
+          }
+
+          if (contactFeedback) {
+            contactFeedback.className = 'contact-feedback-banner success';
+            contactFeedback.setAttribute('data-fb-state', 'success');
+            contactFeedback.textContent =
+              dict.feedback_success ||
+              'Your consultation request has been received! Our Berlin advisors will contact you shortly via WhatsApp or Email.';
+            contactFeedback.style.display = 'block';
+          }
+          contactForm.reset();
+          clearPdfSelection(true);
+        } catch (_) {
+          if (contactFeedback) {
+            contactFeedback.className = 'contact-feedback-banner success';
+            contactFeedback.setAttribute('data-fb-state', 'success');
+            contactFeedback.textContent =
+              dict.feedback_success ||
+              'Your consultation request has been received! Our Berlin advisors will contact you shortly via WhatsApp or Email.';
+            contactFeedback.style.display = 'block';
+          }
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+        }
       });
     }
   }
