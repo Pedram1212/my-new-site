@@ -13,14 +13,17 @@
     activeStoryFilter: 'all',
     wizard: {
       step: 1,
-      goal: 'master',
-      age: 23,
-      gpa: 17.5,
-      langStatus: 'en_ielts',
-      finance: 'blocked_ready',
+      gpa: '16_18',
+      langLevel: 'b1_b2',
+      education: 'bachelor',
+      finance: 'full_blocked',
       calculated: false,
-      score: 92,
+      score: 94,
       recommendedKey: 'master',
+    },
+    costCalc: {
+      pathway: 'Master',
+      months: 12,
     },
   };
 
@@ -36,6 +39,11 @@
     if (state.lang !== 'fa') return String(str);
     const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
     return String(str).replace(/[0-9]/g, (w) => persian[+w]);
+  }
+
+  function formatEuro(amount) {
+    const formatted = Number(amount || 0).toLocaleString('en-US');
+    return `€${toPersianDigits(formatted)}`;
   }
 
   // Bavarian Formula (Bayerische Formel): 1 + 3 * ((Nmax - Nd) / (Nmax - Nmin))
@@ -172,82 +180,88 @@
   }
 
   /* --------------------------------------------------------------------------
-     4. INTERACTIVE SMART ELIGIBILITY CALCULATOR (4-Step Wizard)
+     4. INTERACTIVE 4-STEP SMART PATHWAY ASSESSMENT (#assessment)
      -------------------------------------------------------------------------- */
-  function calculateEligibilityScore() {
+  function evaluateAssessment() {
     const w = state.wizard;
-    let score = 72;
+    let score = 76;
 
-    // GPA contribution (out of 20)
-    const gpa = parseFloat(w.gpa) || 16;
-    if (gpa >= 18) score += 14;
-    else if (gpa >= 16) score += 11;
-    else if (gpa >= 14.5) score += 7;
-    else score += 3;
+    // 1. GPA contribution
+    if (w.gpa === 'above_18') score += 14;
+    else if (w.gpa === '16_18') score += 11;
+    else if (w.gpa === '14_16') score += 8;
+    else score += 4;
 
-    // Age fit per goal
-    const age = parseInt(w.age, 10) || 23;
-    if (w.goal === 'highschool') {
-      score += age <= 18 ? 10 : -8;
-    } else if (w.goal === 'bachelor') {
-      score += age <= 25 ? 8 : age <= 29 ? 4 : 1;
-    } else if (w.goal === 'master') {
-      score += age <= 31 ? 9 : age <= 35 ? 5 : 2;
-    } else if (w.goal === 'ausbildung') {
-      score += age >= 18 && age <= 34 ? 10 : 4;
-    } else {
-      score += 8;
-    }
+    // 2. Language level contribution
+    if (w.langLevel === 'c1_ielts') score += 8;
+    else if (w.langLevel === 'b1_b2') score += 6;
+    else if (w.langLevel === 'a1_a2') score += 3;
+    else score += 1;
 
-    // Language certificate bonus
-    if (w.langStatus === 'de_b2_c1') score += 8;
-    else if (w.langStatus === 'de_b1' || w.langStatus === 'en_ielts') score += 6;
-    else if (w.langStatus === 'de_a1_a2') score += 3;
-
-    // Financial readiness alignment
-    if (w.finance === 'blocked_ready') score += 4;
-    else if (w.finance === 'salaried_only' && w.goal !== 'phd') {
+    // 3. Determine Best Matching Pathway:
+    // Priority rules based on Finance, Education, Language, and GPA
+    if (w.finance === 'partial_ausbildung' || w.education === 'vocational') {
       w.recommendedKey = 'ausbildung';
+    } else if (w.langLevel === 'no_german' || (w.langLevel === 'a1_a2' && w.finance === 'need_guidance')) {
+      w.recommendedKey = 'language';
+    } else if (w.education === 'bachelor') {
+      if (w.gpa === 'below_14' && w.langLevel !== 'c1_ielts') {
+        w.recommendedKey = 'ausbildung';
+      } else {
+        w.recommendedKey = 'master';
+      }
+    } else if (w.education === 'highschool') {
+      if (w.langLevel === 'c1_ielts' && (w.gpa === 'above_18' || w.gpa === '16_18')) {
+        w.recommendedKey = 'bachelor';
+      } else if (w.gpa === 'below_14') {
+        w.recommendedKey = 'ausbildung';
+      } else {
+        w.recommendedKey = 'studienkolleg';
+      }
     } else {
-      w.recommendedKey = w.goal;
+      w.recommendedKey = 'bachelor';
     }
 
-    if (w.finance !== 'salaried_only') {
-      w.recommendedKey = w.goal;
-    }
+    w.score = Math.max(78, Math.min(98, score));
+  }
 
-    w.score = Math.max(68, Math.min(98, score));
+  function buildAssessmentSummaryText(asm, rec, gpaObj, langObj, eduObj, finObj, germanGrade) {
+    return [
+      `${asm.summary_header}`,
+      `• ${asm.result_score_label}: ${wScoreText(state.wizard.score)}%`,
+      `• GPA: ${gpaObj.title} (German Grade ~${germanGrade})`,
+      `• Language: ${langObj.title}`,
+      `• Education: ${eduObj.title}`,
+      `• Finance: ${finObj.title}`,
+      `• Recommended Pathway: ${rec.title}`,
+    ].join('\n');
+  }
+
+  function wScoreText(val) {
+    return String(val);
   }
 
   function renderCalculator() {
     const dict = getDict();
     const container = document.getElementById('wizard-card-container');
-    if (!dict || !container) return;
+    if (!dict || !container || !dict.assessment) return;
 
-    const c = dict.calculator;
+    const asm = dict.assessment;
     const w = state.wizard;
-    const germanGrade = calcGermanGrade(w.gpa);
+
+    const gpaObj = asm.gpa_options.find((g) => g.id === w.gpa) || asm.gpa_options[2];
+    const langObj = asm.lang_options.find((l) => l.id === w.langLevel) || asm.lang_options[2];
+    const eduObj = asm.edu_options.find((e) => e.id === w.education) || asm.edu_options[1];
+    const finObj = asm.fin_options.find((f) => f.id === w.finance) || asm.fin_options[0];
+    const germanGrade = calcGermanGrade(gpaObj.gpa_num || 17.2);
 
     if (w.calculated) {
-      const rec = c.recommendations[w.recommendedKey] || c.recommendations.master;
+      const rec = asm.recommendations[w.recommendedKey] || asm.recommendations.master;
       const deg = Math.round((w.score / 100) * 360);
 
-      const goalObj = c.goals.find((g) => g.id === w.goal) || c.goals[0];
-      const langObj = c.langs.find((l) => l.id === w.langStatus) || c.langs[0];
-      const finObj = c.finance.find((f) => f.id === w.finance) || c.finance[0];
-
-      const summaryText = [
-        `Sabke German — Smart Assessment (${state.lang.toUpperCase()})`,
-        `• Score: ${w.score}%`,
-        `• Goal: ${goalObj.title}`,
-        `• Age: ${w.age} | GPA: ${w.gpa}/20 (German Grade: ${germanGrade})`,
-        `• Language: ${langObj.title}`,
-        `• Finance: ${finObj.title}`,
-        `• Recommended: ${rec.title}`,
-      ].join('\n');
-
-      const waUrl = `https://wa.me/${window.SABKE_CONFIG.whatsapp_number}?text=${encodeURIComponent(summaryText)}`;
-      const mailUrl = `mailto:${window.SABKE_CONFIG.email}?subject=${encodeURIComponent('Sabke German Eligibility Assessment')}&body=${encodeURIComponent(summaryText)}`;
+      const summaryText = buildAssessmentSummaryText(asm, rec, gpaObj, langObj, eduObj, finObj, germanGrade);
+      const waNumber = window.SABKE_CONFIG ? window.SABKE_CONFIG.whatsapp_number : '490000000000';
+      const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(summaryText)}`;
 
       container.innerHTML = `
         <div class="wizard-result-box">
@@ -255,28 +269,46 @@
             <div class="score-ring-container" style="--score-deg: ${deg}deg;">
               <div class="score-ring-inner">
                 <span class="score-value">${toPersianDigits(w.score)}%</span>
-                <span class="score-caption">${c.result_score_label}</span>
+                <span class="score-caption">${asm.result_score_label}</span>
               </div>
             </div>
             <div>
+              <div style="margin-bottom:0.45rem;">
+                <span class="pathway-pill pathway-pill-gold">${rec.badge}</span>
+              </div>
               <h3 class="result-pathway-title">${rec.title}</h3>
               <p class="result-pathway-desc">${rec.desc}</p>
               <div class="result-Metrics-pills">
-                <span class="result-pill">🎯 ${goalObj.title}</span>
-                <span class="result-pill">📊 ${c.german_grade_equiv} <strong>${toPersianDigits(germanGrade)}</strong></span>
+                <span class="result-pill">📊 ${gpaObj.title}</span>
                 <span class="result-pill">🗣 ${langObj.title}</span>
+                <span class="result-pill">🎓 ${eduObj.title}</span>
               </div>
             </div>
           </div>
+          <div class="result-req-box">
+            <div class="result-req-title">✦ ${asm.result_req_heading}</div>
+            <ul class="result-req-list">
+              ${(rec.requirements || [])
+                .map(
+                  (r) => `
+                <li>
+                  <span class="feature-check">✓</span>
+                  <span>${r}</span>
+                </li>
+              `
+                )
+                .join('')}
+            </ul>
+          </div>
           <div class="result-actions">
-            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" id="calc-whatsapp-btn">
-              <span>${c.result_send_whatsapp}</span>
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" id="assessment-send-wa-btn">
+              <span>${asm.result_send_whatsapp}</span>
             </a>
-            <a href="${mailUrl}" class="btn btn-primary" id="calc-email-btn">
-              <span>${c.result_send_email}</span>
-            </a>
+            <button type="button" class="btn btn-primary" id="assessment-prefill-form-btn" data-recommended-form-val="${rec.form_value}">
+              <span>${asm.result_prefill_form}</span>
+            </button>
             <button type="button" class="btn hero-btn-secondary" id="calc-restart-btn">
-              <span>${c.btn_restart}</span>
+              <span>${asm.btn_restart}</span>
             </button>
           </div>
         </div>
@@ -286,7 +318,7 @@
 
     const progressHtml = `
       <div class="wizard-progress">
-        ${c.steps_nav
+        ${asm.steps_nav
           .map((label, idx) => {
             const stepNum = idx + 1;
             const cls = stepNum === w.step ? 'active' : stepNum < w.step ? 'completed' : '';
@@ -305,13 +337,13 @@
     if (w.step === 1) {
       stepBodyHtml = `
         <div class="wizard-step-pane active">
-          <h3 class="wizard-question-title">${c.step1_title}</h3>
-          <p class="wizard-question-hint">${c.step1_hint}</p>
+          <h3 class="wizard-question-title">${asm.step1_title}</h3>
+          <p class="wizard-question-hint">${asm.step1_hint}</p>
           <div class="wizard-options-grid">
-            ${c.goals
+            ${asm.gpa_options
               .map(
                 (g) => `
-              <button type="button" class="wizard-option-card ${w.goal === g.id ? 'selected' : ''}" data-select-goal="${g.id}">
+              <button type="button" class="wizard-option-card ${w.gpa === g.id ? 'selected' : ''}" data-select-gpa="${g.id}">
                 <span class="option-title">${g.title}</span>
                 <span class="option-sub">${g.sub}</span>
               </button>
@@ -324,43 +356,34 @@
     } else if (w.step === 2) {
       stepBodyHtml = `
         <div class="wizard-step-pane active">
-          <h3 class="wizard-question-title">${c.step2_title}</h3>
-          <p class="wizard-question-hint">${c.step2_hint}</p>
-          <div class="wizard-inputs-grid">
-            <div class="form-group">
-              <label class="form-label" for="calc-age-input">
-                <span>${c.age_label}</span>
-                <strong id="calc-age-display">${toPersianDigits(w.age)}</strong>
-              </label>
-              <input type="number" id="calc-age-input" class="form-input" min="12" max="50" value="${w.age}" />
-              <input type="range" id="calc-age-range" class="range-slider" min="12" max="45" value="${w.age}" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="calc-gpa-input">
-                <span>${c.gpa_label}</span>
-                <strong id="calc-gpa-display">${toPersianDigits(w.gpa)} / ${toPersianDigits(20)}</strong>
-              </label>
-              <input type="number" id="calc-gpa-input" class="form-input" min="10" max="20" step="0.1" value="${w.gpa}" />
-              <input type="range" id="calc-gpa-range" class="range-slider" min="10" max="20" step="0.1" value="${w.gpa}" />
-              <div style="margin-top:0.4rem; font-size:0.85rem; color:var(--gold-400);">
-                ${c.german_grade_equiv} <strong id="calc-de-grade-val">${toPersianDigits(germanGrade)}</strong> (1.0 = Best)
-              </div>
-            </div>
+          <h3 class="wizard-question-title">${asm.step2_title}</h3>
+          <p class="wizard-question-hint">${asm.step2_hint}</p>
+          <div class="wizard-options-grid">
+            ${asm.lang_options
+              .map(
+                (l) => `
+              <button type="button" class="wizard-option-card ${w.langLevel === l.id ? 'selected' : ''}" data-select-lang="${l.id}">
+                <span class="option-title">${l.title}</span>
+                <span class="option-sub">${l.sub}</span>
+              </button>
+            `
+              )
+              .join('')}
           </div>
         </div>
       `;
     } else if (w.step === 3) {
       stepBodyHtml = `
         <div class="wizard-step-pane active">
-          <h3 class="wizard-question-title">${c.step3_title}</h3>
-          <p class="wizard-question-hint">${c.step3_hint}</p>
+          <h3 class="wizard-question-title">${asm.step3_title}</h3>
+          <p class="wizard-question-hint">${asm.step3_hint}</p>
           <div class="wizard-options-grid">
-            ${c.langs
+            ${asm.edu_options
               .map(
-                (l) => `
-              <button type="button" class="wizard-option-card ${w.langStatus === l.id ? 'selected' : ''}" data-select-lang-cert="${l.id}">
-                <span class="option-title">${l.title}</span>
-                <span class="option-sub">${l.sub}</span>
+                (edu) => `
+              <button type="button" class="wizard-option-card ${w.education === edu.id ? 'selected' : ''}" data-select-edu="${edu.id}">
+                <span class="option-title">${edu.title}</span>
+                <span class="option-sub">${edu.sub}</span>
               </button>
             `
               )
@@ -371,13 +394,13 @@
     } else if (w.step === 4) {
       stepBodyHtml = `
         <div class="wizard-step-pane active">
-          <h3 class="wizard-question-title">${c.step4_title}</h3>
-          <p class="wizard-question-hint">${c.step4_hint}</p>
+          <h3 class="wizard-question-title">${asm.step4_title}</h3>
+          <p class="wizard-question-hint">${asm.step4_hint}</p>
           <div class="wizard-options-grid">
-            ${c.finance
+            ${asm.fin_options
               .map(
                 (f) => `
-              <button type="button" class="wizard-option-card ${w.finance === f.id ? 'selected' : ''}" data-select-finance="${f.id}">
+              <button type="button" class="wizard-option-card ${w.finance === f.id ? 'selected' : ''}" data-select-fin="${f.id}">
                 <span class="option-title">${f.title}</span>
                 <span class="option-sub">${f.sub}</span>
               </button>
@@ -393,54 +416,102 @@
       <div class="wizard-footer">
         ${
           w.step > 1
-            ? `<button type="button" class="btn hero-btn-secondary" id="wizard-prev-btn">${c.btn_prev}</button>`
+            ? `<button type="button" class="btn hero-btn-secondary" id="wizard-prev-btn">${asm.btn_prev}</button>`
             : `<span></span>`
         }
         ${
           w.step < 4
-            ? `<button type="button" class="btn btn-primary" id="wizard-next-btn">${c.btn_next}</button>`
-            : `<button type="button" class="btn btn-primary" id="wizard-finish-btn">${c.btn_calculate}</button>`
+            ? `<button type="button" class="btn btn-primary" id="wizard-next-btn">${asm.btn_next}</button>`
+            : `<button type="button" class="btn btn-primary" id="wizard-finish-btn">${asm.btn_calculate}</button>`
         }
       </div>
     `;
 
     container.innerHTML = progressHtml + stepBodyHtml + footerHtml;
+  }
 
-    // Bind Step 2 live inputs if active
-    const ageInput = document.getElementById('calc-age-input');
-    const ageRange = document.getElementById('calc-age-range');
-    const gpaInput = document.getElementById('calc-gpa-input');
-    const gpaRange = document.getElementById('calc-gpa-range');
+  /* --------------------------------------------------------------------------
+     5. INTERACTIVE BLOCKED ACCOUNT & STUDY COST CALCULATOR (#cost-calculator)
+     -------------------------------------------------------------------------- */
+  function renderCostCalculator() {
+    const dict = getDict();
+    if (!dict || !dict.cost_calc) return;
+    const cc = dict.cost_calc;
+    const { pathway, months } = state.costCalc;
 
-    if (ageInput && ageRange) {
-      const syncAge = (val) => {
-        w.age = Math.max(12, Math.min(50, parseInt(val, 10) || 18));
-        ageInput.value = w.age;
-        ageRange.value = Math.min(45, w.age);
-        const disp = document.getElementById('calc-age-display');
-        if (disp) disp.textContent = toPersianDigits(w.age);
-      };
-      ageInput.addEventListener('input', (e) => syncAge(e.target.value));
-      ageRange.addEventListener('input', (e) => syncAge(e.target.value));
+    // Update pathway pills
+    const pathwayPillsContainer = document.getElementById('cost-pathway-pills');
+    if (pathwayPillsContainer && cc.pathways) {
+      pathwayPillsContainer.innerHTML = Object.keys(cc.pathways)
+        .map(
+          (key) => `
+        <button type="button" class="cost-pill-btn ${pathway === key ? 'active' : ''}" data-cost-pathway="${key}">
+          ${cc.pathways[key]}
+        </button>
+      `
+        )
+        .join('');
     }
 
-    if (gpaInput && gpaRange) {
-      const syncGpa = (val) => {
-        w.gpa = Math.max(10, Math.min(20, parseFloat(val) || 16));
-        gpaInput.value = w.gpa;
-        gpaRange.value = w.gpa;
-        const disp = document.getElementById('calc-gpa-display');
-        const deDisp = document.getElementById('calc-de-grade-val');
-        if (disp) disp.textContent = `${toPersianDigits(w.gpa)} / ${toPersianDigits(20)}`;
-        if (deDisp) deDisp.textContent = toPersianDigits(calcGermanGrade(w.gpa));
-      };
-      gpaInput.addEventListener('input', (e) => syncGpa(e.target.value));
-      gpaRange.addEventListener('input', (e) => syncGpa(e.target.value));
+    // Update duration pills
+    document.querySelectorAll('[data-cost-months]').forEach((btn) => {
+      const m = parseInt(btn.getAttribute('data-cost-months'), 10);
+      btn.classList.toggle('active', m === months);
+    });
+
+    const isAusbildung = pathway === 'Ausbildung';
+    const sperrkontoVal = isAusbildung ? 0 : 992 * months;
+    const insuranceVal = isAusbildung ? 0 : 130 * months;
+    const semesterVal = isAusbildung ? 0 : months === 12 ? 600 : 300;
+    const visaVal = 75;
+    const totalVal = sperrkontoVal + insuranceVal + semesterVal + visaVal;
+
+    const elSperrkonto = document.getElementById('cost-val-sperrkonto');
+    const elSperrkontoSub = document.getElementById('cost-sperrkonto-sub');
+    const elInsurance = document.getElementById('cost-val-insurance');
+    const elSemester = document.getElementById('cost-val-semester');
+    const elVisa = document.getElementById('cost-val-visa');
+    const elTotal = document.getElementById('cost-val-total');
+    const elTotalNote = document.getElementById('cost-total-note');
+
+    if (elSperrkonto) elSperrkonto.textContent = formatEuro(sperrkontoVal);
+    if (elSperrkontoSub) {
+      elSperrkontoSub.textContent = isAusbildung ? cc.sperrkonto_ausbildung_note : cc.sperrkonto_sub;
+    }
+    if (elInsurance) elInsurance.textContent = isAusbildung ? formatEuro(0) : `~${formatEuro(insuranceVal)}`;
+    if (elSemester) elSemester.textContent = isAusbildung ? formatEuro(0) : `~${formatEuro(semesterVal)}`;
+    if (elVisa) elVisa.textContent = formatEuro(visaVal);
+    if (elTotal) elTotal.textContent = formatEuro(totalVal);
+    if (elTotalNote) {
+      elTotalNote.textContent = isAusbildung ? cc.total_note_ausbildung : cc.total_note_study;
     }
   }
 
   /* --------------------------------------------------------------------------
-     5. ROADMAP, PRICING, SUCCESS STORIES & FAQ RENDERERS
+     6. VISA CHECKLIST LEAD MAGNET RENDERER (#visa-checklist)
+     -------------------------------------------------------------------------- */
+  function renderChecklistItems() {
+    const dict = getDict();
+    const grid = document.getElementById('checklist-docs-grid');
+    if (!dict || !dict.checklist_lead || !grid) return;
+
+    grid.innerHTML = dict.checklist_lead.items
+      .map(
+        (item, idx) => `
+      <label class="checklist-doc-item" for="visa-chk-${idx}">
+        <input type="checkbox" id="visa-chk-${idx}" class="checklist-doc-checkbox" checked />
+        <div class="checklist-doc-body">
+          <div class="checklist-doc-title">${item.title}</div>
+          <div class="checklist-doc-detail">${item.detail}</div>
+        </div>
+      </label>
+    `
+      )
+      .join('');
+  }
+
+  /* --------------------------------------------------------------------------
+     7. ROADMAP, PRICING, SUCCESS STORIES & FAQ RENDERERS
      -------------------------------------------------------------------------- */
   function renderRoadmap() {
     const dict = getDict();
@@ -571,7 +642,7 @@
   }
 
   /* --------------------------------------------------------------------------
-     6. FULL LANGUAGE SWITCHER (Updates DOM, RTL/LTR, SEO Meta & Dynamic Blocks)
+     8. FULL LANGUAGE SWITCHER (Updates DOM, RTL/LTR, SEO Meta & Dynamic Blocks)
      -------------------------------------------------------------------------- */
   function setLanguage(lang, pushUrl = true) {
     if (!window.SABKE_I18N || !window.SABKE_I18N[lang]) return;
@@ -629,6 +700,8 @@
     renderPathways();
     renderServices();
     renderCalculator();
+    renderCostCalculator();
+    renderChecklistItems();
     renderRoadmap();
     renderPricing();
     renderStories();
@@ -678,7 +751,7 @@
   }
 
   /* --------------------------------------------------------------------------
-     7. EVENT DELEGATION & INITIALIZATION
+     9. EVENT DELEGATION & INITIALIZATION
      -------------------------------------------------------------------------- */
   function initEvents() {
     // Sticky header scroll shadow
@@ -742,22 +815,22 @@
         return;
       }
 
-      // Jump from Pathway to Calculator with pre-selected goal
+      // Jump from Pathway to Smart Assessment with pre-selected education/pathway
       const jumpCalc = e.target.closest('[data-jump-calc]');
       if (jumpCalc) {
         const pid = jumpCalc.getAttribute('data-jump-calc');
-        const mapGoal = {
-          university: 'master',
-          school: 'highschool',
-          studienkolleg: 'bachelor',
-          ausbildung: 'ausbildung',
-          language: 'bachelor',
-        };
-        state.wizard.goal = mapGoal[pid] || 'master';
+        if (pid === 'university') state.wizard.education = 'bachelor';
+        else if (pid === 'studienkolleg' || pid === 'school') state.wizard.education = 'highschool';
+        else if (pid === 'ausbildung') {
+          state.wizard.education = 'vocational';
+          state.wizard.finance = 'partial_ausbildung';
+        } else if (pid === 'language') {
+          state.wizard.langLevel = 'no_german';
+        }
         state.wizard.calculated = false;
-        state.wizard.step = 2;
+        state.wizard.step = 1;
         renderCalculator();
-        const calcSec = document.getElementById('calculator');
+        const calcSec = document.getElementById('assessment');
         if (calcSec) calcSec.scrollIntoView({ behavior: 'smooth' });
         return;
       }
@@ -771,31 +844,39 @@
         return;
       }
 
-      // Wizard Step 1 Goal
-      const goalCard = e.target.closest('[data-select-goal]');
-      if (goalCard) {
-        state.wizard.goal = goalCard.getAttribute('data-select-goal');
-        if (state.wizard.goal === 'highschool' && state.wizard.age > 18) {
-          state.wizard.age = 16;
-        }
+      // Wizard Step 1: Academic GPA
+      const gpaCard = e.target.closest('[data-select-gpa]');
+      if (gpaCard) {
+        state.wizard.gpa = gpaCard.getAttribute('data-select-gpa');
         state.wizard.step = 2;
         renderCalculator();
         return;
       }
 
-      // Wizard Step 3 Language
-      const langCard = e.target.closest('[data-select-lang-cert]');
+      // Wizard Step 2: Language Level
+      const langCard = e.target.closest('[data-select-lang]');
       if (langCard) {
-        state.wizard.langStatus = langCard.getAttribute('data-select-lang-cert');
+        state.wizard.langLevel = langCard.getAttribute('data-select-lang');
+        state.wizard.step = 3;
+        renderCalculator();
+        return;
+      }
+
+      // Wizard Step 3: Current Education & Age
+      const eduCard = e.target.closest('[data-select-edu]');
+      if (eduCard) {
+        state.wizard.education = eduCard.getAttribute('data-select-edu');
         state.wizard.step = 4;
         renderCalculator();
         return;
       }
 
-      // Wizard Step 4 Finance
-      const finCard = e.target.closest('[data-select-finance]');
+      // Wizard Step 4: Financial Readiness
+      const finCard = e.target.closest('[data-select-fin]');
       if (finCard) {
-        state.wizard.finance = finCard.getAttribute('data-select-finance');
+        state.wizard.finance = finCard.getAttribute('data-select-fin');
+        evaluateAssessment();
+        state.wizard.calculated = true;
         renderCalculator();
         return;
       }
@@ -812,7 +893,7 @@
         return;
       }
       if (e.target.closest('#wizard-finish-btn')) {
-        calculateEligibilityScore();
+        evaluateAssessment();
         state.wizard.calculated = true;
         renderCalculator();
         return;
@@ -821,6 +902,72 @@
         state.wizard.calculated = false;
         state.wizard.step = 1;
         renderCalculator();
+        return;
+      }
+
+      // Assessment Result: "Pre-fill Consultation Form" button
+      const prefillBtn = e.target.closest('#assessment-prefill-form-btn');
+      if (prefillBtn) {
+        const dict = getDict();
+        if (dict && dict.assessment) {
+          const asm = dict.assessment;
+          const w = state.wizard;
+          const rec = asm.recommendations[w.recommendedKey] || asm.recommendations.master;
+          const gpaObj = asm.gpa_options.find((g) => g.id === w.gpa) || asm.gpa_options[2];
+          const langObj = asm.lang_options.find((l) => l.id === w.langLevel) || asm.lang_options[2];
+          const eduObj = asm.edu_options.find((ed) => ed.id === w.education) || asm.edu_options[1];
+          const finObj = asm.fin_options.find((f) => f.id === w.finance) || asm.fin_options[0];
+          const germanGrade = calcGermanGrade(gpaObj.gpa_num || 17.2);
+
+          const summaryText = buildAssessmentSummaryText(asm, rec, gpaObj, langObj, eduObj, finObj, germanGrade);
+          const pathwaySelect = document.getElementById('contact-pathway');
+          if (pathwaySelect && rec.form_value) {
+            pathwaySelect.value = rec.form_value;
+          }
+          const msgBox = document.getElementById('contact-message');
+          if (msgBox) {
+            msgBox.value = summaryText;
+          }
+        }
+        const contactSec = document.getElementById('contact');
+        if (contactSec) {
+          contactSec.scrollIntoView({ behavior: 'smooth' });
+        }
+        return;
+      }
+
+      // Cost Calculator: Pathway pill selection
+      const costPathwayBtn = e.target.closest('[data-cost-pathway]');
+      if (costPathwayBtn) {
+        state.costCalc.pathway = costPathwayBtn.getAttribute('data-cost-pathway');
+        renderCostCalculator();
+        return;
+      }
+
+      // Cost Calculator: Duration (6 or 12 months) pill selection
+      const costMonthsBtn = e.target.closest('[data-cost-months]');
+      if (costMonthsBtn) {
+        state.costCalc.months = parseInt(costMonthsBtn.getAttribute('data-cost-months'), 10) || 12;
+        renderCostCalculator();
+        return;
+      }
+
+      // Cost Calculator CTA -> scroll to #contact & pre-select pathway
+      if (e.target.closest('#cost-calc-consult-btn')) {
+        const pathwaySelect = document.getElementById('contact-pathway');
+        if (pathwaySelect && state.costCalc.pathway) {
+          pathwaySelect.value = state.costCalc.pathway;
+        }
+        const contactSec = document.getElementById('contact');
+        if (contactSec) {
+          contactSec.scrollIntoView({ behavior: 'smooth' });
+        }
+        return;
+      }
+
+      // Print / Save PDF Checklist button
+      if (e.target.closest('#checklist-print-btn')) {
+        window.print();
         return;
       }
 
@@ -922,6 +1069,45 @@
       consultEmailBtn.addEventListener('click', () => {
         const text = getConsultPayload();
         window.location.href = `mailto:${window.SABKE_CONFIG.email}?subject=${encodeURIComponent('Consultation Request — Sabke German')}&body=${encodeURIComponent(text)}`;
+      });
+    }
+
+    // ------------------------------------------------------------------------
+    // Lead Magnet Form Submission (#checklist-lead-form)
+    // ------------------------------------------------------------------------
+    const checklistForm = document.getElementById('checklist-lead-form');
+    const checklistPanel = document.getElementById('checklist-unlocked-panel');
+
+    if (checklistForm && checklistPanel) {
+      checklistForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nameVal = (document.getElementById('checklist-lead-name')?.value || '').trim();
+        const contactVal = (document.getElementById('checklist-lead-contact')?.value || '').trim();
+        if (!nameVal || !contactVal) return;
+
+        const submitBtn = document.getElementById('checklist-lead-submit');
+        if (submitBtn) submitBtn.disabled = true;
+
+        const actionUrl = checklistForm.getAttribute('action') || 'YOUR_FORM_ENDPOINT_URL';
+        try {
+          if (actionUrl && actionUrl !== 'YOUR_FORM_ENDPOINT_URL') {
+            const formData = new FormData(checklistForm);
+            await fetch(actionUrl, {
+              method: 'POST',
+              body: formData,
+              headers: { Accept: 'application/json' },
+            });
+          } else {
+            await new Promise((resolve) => setTimeout(resolve, 250));
+          }
+        } catch (_) {
+          // Proceed to unlock checklist even if offline
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+        }
+
+        checklistPanel.style.display = 'block';
+        checklistPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     }
 

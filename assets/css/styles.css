@@ -2389,6 +2389,320 @@ html[dir="rtl"] .hero-title {
 }
 
 /* ==========================================================================
+   10.B ASSESSMENT REQUIREMENTS, SPERRKONTO COST CALCULATOR & VISA CHECKLIST
+   ========================================================================== */
+.result-req-box {
+  margin-top: 1.15rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.result-req-heading {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--gold-400);
+  margin-bottom: 0.65rem;
+}
+
+.result-req-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.55rem 1.15rem;
+}
+
+.result-req-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+  color: #E2E8F0;
+  line-height: 1.5;
+}
+
+.result-req-item .feature-check {
+  color: var(--gold-400);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* Interactive Blocked Account & Germany Study Cost Calculator */
+.cost-calc-card {
+  max-width: 980px;
+  margin-inline: auto;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.75rem, 3.5vw, 2.75rem);
+  box-shadow: var(--shadow-md);
+}
+
+.cost-controls-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.5rem;
+  padding-bottom: 1.75rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.cost-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.cost-control-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.cost-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cost-pill-btn {
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-subtle);
+  border: 1.5px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.cost-pill-btn:hover {
+  border-color: var(--gold-500);
+  color: var(--text-primary);
+}
+
+.cost-pill-btn.active {
+  background-color: var(--navy-900);
+  border-color: var(--navy-900);
+  color: var(--gold-400);
+  box-shadow: var(--shadow-xs);
+}
+
+[data-theme="dark"] .cost-pill-btn.active {
+  background-color: var(--gold-500);
+  border-color: var(--gold-500);
+  color: var(--navy-950);
+}
+
+.cost-breakdown-panel {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.75rem;
+  align-items: stretch;
+}
+
+.cost-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.cost-line-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+}
+
+.cost-line-item.highlight {
+  background-color: var(--gold-50);
+  border-color: rgba(245, 158, 11, 0.38);
+}
+
+[data-theme="dark"] .cost-line-item.highlight {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+.cost-line-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.cost-line-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.cost-line-amount {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-latin) !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cost-summary-box {
+  background: linear-gradient(155deg, var(--navy-900) 0%, var(--navy-950) 100%);
+  color: #F8FAFC;
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.cost-total-caption {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.35rem;
+}
+
+.cost-total-number {
+  font-size: clamp(2rem, 3.5vw, 2.65rem);
+  font-weight: 800;
+  color: var(--gold-400);
+  font-family: var(--font-latin) !important;
+  line-height: 1.15;
+  margin-bottom: 0.85rem;
+}
+
+.cost-total-note {
+  font-size: 0.82rem;
+  color: #CBD5E1;
+  line-height: 1.65;
+}
+
+/* Lead Magnet: Free Germany Student Visa Document Checklist */
+.checklist-lead-card {
+  background-color: var(--bg-secondary);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.75rem, 3.5vw, 2.75rem);
+  box-shadow: var(--shadow-md);
+}
+
+.checklist-lead-top {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 2.25rem;
+  align-items: center;
+}
+
+.checklist-lead-form {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.checklist-unlocked-panel {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px dashed var(--border-strong);
+  animation: fadeSlideIn 260ms ease forwards;
+}
+
+.checklist-unlocked-panel[hidden] {
+  display: none !important;
+}
+
+.checklist-unlocked-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.35rem;
+}
+
+.checklist-unlocked-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.checklist-unlocked-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.checklist-docs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+.checklist-doc-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.checklist-doc-item:hover {
+  border-color: var(--gold-500);
+}
+
+.checklist-doc-checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.2rem;
+  accent-color: var(--emerald-600);
+  flex-shrink: 0;
+}
+
+.checklist-doc-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.checklist-doc-detail {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Dedicated Legal Pages (/impressum & /datenschutz) */
+.legal-page-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.75rem, 3.5vw, 2.75rem);
+  box-shadow: var(--shadow-sm);
+}
+
+.legal-page-card a {
+  color: var(--gold-600);
+  text-decoration: underline;
+}
+
+/* ==========================================================================
    11. RESPONSIVE BREAKPOINTS
    ========================================================================== */
 @media (max-width: 1100px) {
@@ -2433,7 +2747,10 @@ html[dir="rtl"] .hero-title {
 @media (max-width: 1080px) {
   .hero-grid,
   .pathway-detail-panel,
-  .contact-grid {
+  .contact-grid,
+  .cost-controls-grid,
+  .cost-breakdown-panel,
+  .checklist-lead-top {
     grid-template-columns: 1fr;
   }
   .pricing-grid,
@@ -2461,7 +2778,9 @@ html[dir="rtl"] .hero-title {
   .stories-grid,
   .roadmap-grid,
   .wizard-inputs-grid,
-  .contact-form-row {
+  .contact-form-row,
+  .result-req-list,
+  .checklist-docs-grid {
     grid-template-columns: 1fr;
   }
   .wizard-progress {
@@ -2486,5 +2805,32 @@ html[dir="rtl"] .hero-title {
   .lang-btn {
     padding: 0.3rem 0.42rem;
     font-size: 0.72rem;
+  }
+}
+
+@media print {
+  .site-header,
+  .hero-section,
+  #pathways,
+  #services,
+  #assessment,
+  #cost-calculator,
+  #roadmap,
+  #pricing,
+  #stories,
+  #faq,
+  #contact,
+  .site-footer,
+  .floating-consult-widget,
+  .cookie-banner,
+  .checklist-lead-top,
+  #checklist-print-btn {
+    display: none !important;
+  }
+  .checklist-unlocked-panel {
+    display: block !important;
+    border-top: none !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
   }
 }

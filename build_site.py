@@ -8,9 +8,12 @@ Generates:
   - /de/index.html (German, LTR)
   - /en/index.html (English, LTR)
   - /az/index.html (Azerbaijani, LTR)
+  - /impressum/index.html (German § 5 DDG / TMG Legal Notice)
+  - /datenschutz/index.html (GDPR / DSGVO Privacy Policy covering forms, WhatsApp & PDF uploads)
   - /assets/js/i18n-data.js
   - /sitemap.xml
   - /robots.txt
+  - /llms.txt (AEO / AI Search Engine Optimization)
 """
 
 import json
@@ -29,16 +32,17 @@ def build_json_ld(lang_code: str, d: dict) -> str:
         "@type": "EducationalOrganization",
         "@id": f"{domain}/#organization",
         "name": "Sabke German (سبک ژرمن)",
+        "legalName": SITE_CONFIG["legal_name"],
         "alternateName": ["Sabke German", "سبک ژرمن", "Sabke German Bildungsberatung"],
         "url": f"{domain}/{lang_code}" if lang_code != "fa" else domain,
         "logo": f"{domain}/assets/images/favicon.svg",
         "image": f"{domain}/assets/images/hero-campus.jpg",
         "description": d["meta"]["description"],
         "email": SITE_CONFIG["email"],
-        "telephone": SITE_CONFIG["phone_de"],
+        "telephone": SITE_CONFIG["phone"],
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Kurfürstendamm 194",
+            "streetAddress": SITE_CONFIG["street_address"],
             "addressLocality": "Berlin",
             "postalCode": "10707",
             "addressCountry": "DE",
@@ -76,7 +80,7 @@ def build_json_ld(lang_code: str, d: dict) -> str:
 def render_page_html(lang_code: str, is_root: bool = False) -> str:
     d = TRANSLATIONS[lang_code]
     domain = SITE_CONFIG["domain"]
-    canonical_url = domain if is_root else f"{domain}/{lang_code}"
+    canonical_url = f"{domain}/" if is_root else f"{domain}/{lang_code}"
     active_tab = d["pathways"]["tabs"][0]
     wa_direct_url = f"https://wa.me/{SITE_CONFIG['whatsapp_number']}?text={quote(d['contact']['whatsapp_greeting'])}"
 
@@ -211,23 +215,48 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
         ]
     )
 
-    # Pre-render Calculator Step 1
-    calc_steps_html = "\n".join(
+    # Pre-render 4-Step Smart Assessment Step 1 (Academic GPA)
+    asm = d["assessment"]
+    asm_steps_html = "\n".join(
         [
             f'''            <button type="button" class="wizard-step-indicator {'active' if i == 0 else ''}" data-goto-step="{i + 1}">
               <span class="step-num">{i + 1}</span>
               <span>{escape(lbl)}</span>
             </button>'''
-            for i, lbl in enumerate(d["calculator"]["steps_nav"])
+            for i, lbl in enumerate(asm["steps_nav"])
         ]
     )
-    calc_goals_html = "\n".join(
+    asm_gpa_html = "\n".join(
         [
-            f'''              <button type="button" class="wizard-option-card {'selected' if g['id'] == 'master' else ''}" data-select-goal="{g['id']}">
+            f'''              <button type="button" class="wizard-option-card {'selected' if g['id'] == '16_18' else ''}" data-select-gpa="{g['id']}">
                 <span class="option-title">{escape(g['title'])}</span>
                 <span class="option-sub">{escape(g['sub'])}</span>
               </button>'''
-            for g in d["calculator"]["goals"]
+            for g in asm["gpa_options"]
+        ]
+    )
+
+    # Pre-render Cost Calculator (Default: Master, 12 Months)
+    cc = d["cost_calc"]
+    cost_pathway_btns_html = "\n".join(
+        [
+            f'''              <button type="button" class="cost-pill-btn {'active' if k == 'Master' else ''}" data-cost-pathway="{k}">{escape(v)}</button>'''
+            for k, v in cc["pathways"].items()
+        ]
+    )
+
+    # Pre-render Visa Checklist Items
+    cl = d["checklist_lead"]
+    checklist_items_html = "\n".join(
+        [
+            f'''              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">{escape(item['title'])}</div>
+                  <div class="checklist-doc-detail">{escape(item['detail'])}</div>
+                </div>
+              </label>'''
+            for item in cl["items"]
         ]
     )
 
@@ -265,8 +294,9 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
   <meta name="twitter:description" content="{escape(d['meta']['description'])}" />
   <meta name="twitter:image" content="{domain}/assets/images/hero-campus.jpg" />
 
-  <!-- Favicon -->
+  <!-- Favicon & AI Discovery -->
   <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg" />
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt AI Guide" />
 
   <!-- Google Fonts: Vazirmatn (Persian RTL) + Plus Jakarta Sans & Inter (DE/EN/AZ LTR) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -278,13 +308,16 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
 
   <!-- JSON-LD Structured Data (EducationalOrganization + FAQPage) -->
   {json_ld_block}
+
+  <!-- Vercel Web Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <!-- Subtle German Flag Top Accent Bar -->
   <div class="german-tricolor-bar" aria-hidden="true"></div>
 
   <!-- ========================================================================
-       STICKY HEADER & MULTILINGUAL NAVIGATION
+       STICKY HEADER & MULTILINGUAL NAVIGATION (3-Column Layout + 4x2 Nav Grid)
        ======================================================================== -->
   <header class="site-header" id="site-header">
     <div class="container header-inner">
@@ -299,7 +332,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
       <nav class="main-nav nav-links" aria-label="Primary Navigation">
         <a href="#pathways" class="nav-link" data-i18n="nav.pathways">{escape(d['nav']['pathways'])}</a>
         <a href="#services" class="nav-link" data-i18n="nav.services">{escape(d['nav']['services'])}</a>
-        <a href="#calculator" class="nav-link" data-i18n="nav.calculator">{escape(d['nav']['calculator'])}</a>
+        <a href="#assessment" class="nav-link" data-i18n="nav.calculator">{escape(d['nav']['calculator'])}</a>
         <a href="#roadmap" class="nav-link" data-i18n="nav.roadmap">{escape(d['nav']['roadmap'])}</a>
         <a href="#pricing" class="nav-link" data-i18n="nav.pricing">{escape(d['nav']['pricing'])}</a>
         <a href="#stories" class="nav-link" data-i18n="nav.stories">{escape(d['nav']['stories'])}</a>
@@ -374,7 +407,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
             <p class="hero-subtitle" data-i18n="hero.subtitle">{escape(d['hero']['subtitle'])}</p>
 
             <div class="hero-actions">
-              <a href="#calculator" class="btn btn-primary" id="hero-cta-eligibility">
+              <a href="#assessment" class="btn btn-primary" id="hero-cta-eligibility">
                 <span data-i18n="hero.cta_primary">{escape(d['hero']['cta_primary'])}</span>
                 <span class="dir-flip">→</span>
               </a>
@@ -448,7 +481,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
     </section>
 
     <!-- ======================================================================
-         B. STUDY PATHWAYS IN GERMANY (Interactive Tabbed Detail View)
+         B. 5 CORE EDUCATIONAL & MIGRATION PATHWAYS (Interactive Tabs)
          ====================================================================== -->
     <section class="section" id="pathways">
       <div class="container">
@@ -475,13 +508,14 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
             </ul>
             <div class="hero-actions" style="margin-bottom:0;">
               <button type="button" class="btn btn-primary" data-jump-calc="{active_tab['id']}" id="pathway-eval-cta">
-                <span>{escape(d['pathways']['cta_evaluate'])}</span>
+                <span data-i18n="pathways.cta_evaluate">{escape(d['pathways']['cta_evaluate'])}</span>
               </button>
               <button type="button" class="btn btn-outline" data-open-modal="consult-modal" data-preselect-pathway="{escape(active_tab['title'])}" id="pathway-consult-cta">
-                <span>{escape(d['pathways']['cta_consult'])}</span>
+                <span data-i18n="pathways.cta_consult">{escape(d['pathways']['cta_consult'])}</span>
               </button>
             </div>
           </div>
+
           <div class="pathway-metrics-card">
             <img src="{active_tab['image']}" alt="{escape(active_tab['title'])}" class="pathway-visual-img" loading="lazy" />
             <div class="pathway-metrics-body">
@@ -525,30 +559,110 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
     </section>
 
     <!-- ======================================================================
-         D. INTERACTIVE SMART ELIGIBILITY CALCULATOR (4-Step Assessment Wizard)
+         D.1 INTERACTIVE 4-STEP SMART PATHWAY ASSESSMENT (ارزیابی هوشمند)
          ====================================================================== -->
-    <section class="section calculator-section" id="calculator">
+    <section class="section calculator-section" id="assessment">
+      <span id="calculator" aria-hidden="true"></span>
       <div class="container">
         <div class="section-header">
-          <div class="eyebrow" data-i18n="calculator.eyebrow">{escape(d['calculator']['eyebrow'])}</div>
-          <h2 class="section-title" data-i18n="calculator.title">{escape(d['calculator']['title'])}</h2>
-          <p class="section-subtitle" data-i18n="calculator.subtitle">{escape(d['calculator']['subtitle'])}</p>
+          <div class="eyebrow" data-i18n="assessment.eyebrow">{escape(asm['eyebrow'])}</div>
+          <h2 class="section-title" data-i18n="assessment.title">{escape(asm['title'])}</h2>
+          <p class="section-subtitle" data-i18n="assessment.subtitle">{escape(asm['subtitle'])}</p>
         </div>
 
         <div class="wizard-card" id="wizard-card-container">
           <div class="wizard-progress">
-{calc_steps_html}
+{asm_steps_html}
           </div>
           <div class="wizard-step-pane active">
-            <h3 class="wizard-question-title">{escape(d['calculator']['step1_title'])}</h3>
-            <p class="wizard-question-hint">{escape(d['calculator']['step1_hint'])}</p>
+            <h3 class="wizard-question-title">{escape(asm['step1_title'])}</h3>
+            <p class="wizard-question-hint">{escape(asm['step1_hint'])}</p>
             <div class="wizard-options-grid">
-{calc_goals_html}
+{asm_gpa_html}
             </div>
           </div>
           <div class="wizard-footer">
             <span></span>
-            <button type="button" class="btn btn-primary" id="wizard-next-btn">{escape(d['calculator']['btn_next'])}</button>
+            <button type="button" class="btn btn-primary" id="wizard-next-btn">{escape(asm['btn_next'])}</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         D.2 INTERACTIVE BLOCKED ACCOUNT & GERMANY STUDY COST CALCULATOR (ماشینحساب تمکن مالی)
+         ====================================================================== -->
+    <section class="section section-alt cost-calc-section" id="cost-calculator">
+      <div class="container">
+        <div class="section-header">
+          <div class="eyebrow" data-i18n="cost_calc.eyebrow">{escape(cc['eyebrow'])}</div>
+          <h2 class="section-title" data-i18n="cost_calc.title">{escape(cc['title'])}</h2>
+          <p class="section-subtitle" data-i18n="cost_calc.subtitle">{escape(cc['subtitle'])}</p>
+        </div>
+
+        <div class="cost-calc-card" id="cost-calc-card">
+          <div class="cost-controls-grid">
+            <div class="cost-control-group">
+              <label class="cost-control-label" data-i18n="cost_calc.pathway_label">{escape(cc['pathway_label'])}</label>
+              <div class="cost-pills-row" id="cost-pathway-pills">
+{cost_pathway_btns_html}
+              </div>
+            </div>
+
+            <div class="cost-control-group">
+              <label class="cost-control-label" data-i18n="cost_calc.duration_label">{escape(cc['duration_label'])}</label>
+              <div class="cost-pills-row" id="cost-duration-pills">
+                <button type="button" class="cost-pill-btn" data-cost-months="6" data-i18n="cost_calc.months_6">{escape(cc['months_6'])}</button>
+                <button type="button" class="cost-pill-btn active" data-cost-months="12" data-i18n="cost_calc.months_12">{escape(cc['months_12'])}</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cost-breakdown-panel" id="cost-breakdown-panel">
+            <div class="cost-items-list">
+              <div class="cost-line-item highlight">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.sperrkonto_label">{escape(cc['sperrkonto_label'])}</div>
+                  <div class="cost-line-sub" id="cost-sperrkonto-sub" data-i18n="cost_calc.sperrkonto_sub">{escape(cc['sperrkonto_sub'])}</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-sperrkonto" dir="ltr">€11,904</div>
+              </div>
+
+              <div class="cost-line-item">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.insurance_label">{escape(cc['insurance_label'])}</div>
+                  <div class="cost-line-sub" data-i18n="cost_calc.insurance_sub">{escape(cc['insurance_sub'])}</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-insurance" dir="ltr">€1,560</div>
+              </div>
+
+              <div class="cost-line-item">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.semester_label">{escape(cc['semester_label'])}</div>
+                  <div class="cost-line-sub" data-i18n="cost_calc.semester_sub">{escape(cc['semester_sub'])}</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-semester" dir="ltr">€600</div>
+              </div>
+
+              <div class="cost-line-item">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.visa_fee_label">{escape(cc['visa_fee_label'])}</div>
+                  <div class="cost-line-sub" data-i18n="cost_calc.visa_fee_sub">{escape(cc['visa_fee_sub'])}</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-visa" dir="ltr">€75</div>
+              </div>
+            </div>
+
+            <div class="cost-summary-box">
+              <div>
+                <div class="cost-total-caption" data-i18n="cost_calc.total_label">{escape(cc['total_label'])}</div>
+                <div class="cost-total-number" id="cost-val-total" dir="ltr">€14,139</div>
+                <p class="cost-total-note" id="cost-total-note" data-i18n="cost_calc.total_note_study">{escape(cc['total_note_study'])}</p>
+              </div>
+              <a href="#contact" class="btn btn-primary" id="cost-calc-cta-btn" style="width:100%; justify-content:center;">
+                <span data-i18n="cost_calc.cta_btn">{escape(cc['cta_btn'])}</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -627,9 +741,59 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
     </section>
 
     <!-- ======================================================================
+         G.3 LEAD MAGNET: FREE GERMANY STUDENT VISA DOCUMENT CHECKLIST
+         ====================================================================== -->
+    <section class="section checklist-lead-section" id="visa-checklist">
+      <div class="container">
+        <div class="checklist-lead-card">
+          <div class="checklist-lead-top">
+            <div class="checklist-lead-copy">
+              <div class="eyebrow" data-i18n="checklist_lead.eyebrow">{escape(cl['eyebrow'])}</div>
+              <h2 class="section-title" style="margin-bottom:0.75rem;" data-i18n="checklist_lead.title">{escape(cl['title'])}</h2>
+              <p class="section-subtitle" style="margin-bottom:1rem;" data-i18n="checklist_lead.subtitle">{escape(cl['subtitle'])}</p>
+              <span class="pathway-pill pathway-pill-gold" data-i18n="checklist_lead.badge">✦ {escape(cl['badge'])}</span>
+            </div>
+
+            <form id="checklist-lead-form" class="checklist-lead-form" action="{escape(SITE_CONFIG['form_endpoint'])}" method="POST" novalidate>
+              <input type="hidden" name="lead_type" value="visa_checklist" />
+              <div class="contact-field-group">
+                <label class="contact-label" for="checklist-lead-name" data-i18n="checklist_lead.name_label">{escape(cl['name_label'])}</label>
+                <input type="text" id="checklist-lead-name" name="full_name" class="contact-input" required placeholder="{escape(cl['name_placeholder'])}" data-i18n-placeholder="checklist_lead.name_placeholder" />
+              </div>
+              <div class="contact-field-group">
+                <label class="contact-label" for="checklist-lead-contact" data-i18n="checklist_lead.contact_label">{escape(cl['contact_label'])}</label>
+                <input type="text" id="checklist-lead-contact" name="email_or_whatsapp" class="contact-input" required dir="ltr" placeholder="{escape(cl['contact_placeholder'])}" data-i18n-placeholder="checklist_lead.contact_placeholder" />
+              </div>
+              <button type="submit" class="btn btn-primary" id="checklist-unlock-btn" style="width:100%; justify-content:center;">
+                <span data-i18n="checklist_lead.submit_btn">{escape(cl['submit_btn'])}</span>
+              </button>
+              <p class="contact-privacy-note" style="text-align:center;" data-i18n="checklist_lead.privacy_hint">{escape(cl['privacy_hint'])}</p>
+            </form>
+          </div>
+
+          <!-- Unlocked Printable / PDF-Ready Checklist Panel -->
+          <div class="checklist-unlocked-panel" id="checklist-unlocked-panel" hidden>
+            <div class="checklist-unlocked-header">
+              <div>
+                <h3 class="checklist-unlocked-title" data-i18n="checklist_lead.unlocked_title">{escape(cl['unlocked_title'])}</h3>
+                <p class="checklist-unlocked-sub" data-i18n="checklist_lead.unlocked_subtitle">{escape(cl['unlocked_subtitle'])}</p>
+              </div>
+              <button type="button" class="btn btn-primary" id="checklist-print-btn">
+                <span data-i18n="checklist_lead.print_btn">{escape(cl['print_btn'])}</span>
+              </button>
+            </div>
+            <div class="checklist-docs-grid" id="checklist-docs-grid">
+{checklist_items_html}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
          H. CONTACT, CONSULTATION & PDF DOCUMENT UPLOAD SECTION
          ====================================================================== -->
-    <section class="section contact-section" id="contact">
+    <section class="section section-alt contact-section" id="contact">
       <div class="container">
         <div class="section-header">
           <div class="eyebrow" data-i18n="contact.eyebrow">{escape(d['contact']['eyebrow'])}</div>
@@ -661,14 +825,14 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
                 <span class="contact-info-icon">🇩🇪</span>
                 <div>
                   <div class="contact-info-label">Berlin Headquarters</div>
-                  <div class="contact-info-val">{escape(SITE_CONFIG['address_berlin'])}</div>
+                  <div class="contact-info-val">{escape(SITE_CONFIG['street_address'])}, {escape(SITE_CONFIG['postal_city'])}</div>
                 </div>
               </div>
               <div class="contact-info-item">
                 <span class="contact-info-icon">📞</span>
                 <div>
                   <div class="contact-info-label">WhatsApp &amp; Direct Line</div>
-                  <div class="contact-info-val" dir="ltr">+49 000 0000000 • {escape(SITE_CONFIG['phone_de'])}</div>
+                  <div class="contact-info-val" dir="ltr">+49 000 0000000 • {escape(SITE_CONFIG['phone'])}</div>
                 </div>
               </div>
               <div class="contact-info-item">
@@ -784,7 +948,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
   </main>
 
   <!-- ========================================================================
-       FOOTER & GERMAN LEGAL COMPLIANCE LINKS (Impressum & GDPR)
+       FOOTER & GERMAN LEGAL COMPLIANCE LINKS (Impressum & Datenschutzerklärung)
        ======================================================================== -->
   <footer class="site-footer">
     <div class="container">
@@ -813,11 +977,12 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
           <div class="footer-links">
             <a href="#pathways" data-i18n="nav.pathways">{escape(d['nav']['pathways'])}</a>
             <a href="#services" data-i18n="nav.services">{escape(d['nav']['services'])}</a>
-            <a href="#calculator" data-i18n="nav.calculator">{escape(d['nav']['calculator'])}</a>
-            <a href="#roadmap" data-i18n="nav.roadmap">{escape(d['nav']['roadmap'])}</a>
-            <a href="#pricing" data-i18n="nav.pricing">{escape(d['nav']['pricing'])}</a>
-            <a href="#faq" data-i18n="nav.faq">{escape(d['nav']['faq'])}</a>
+            <a href="#assessment" data-i18n="nav.calculator">{escape(d['nav']['calculator'])}</a>
+            <a href="#cost-calculator" data-i18n="cost_calc.title">{escape(cc['title'])}</a>
+            <a href="#visa-checklist" data-i18n="checklist_lead.title">{escape(cl['title'])}</a>
             <a href="#contact" data-i18n="nav.contact">{escape(d['nav']['contact'])}</a>
+            <a href="/impressum" data-i18n="footer.impressum_btn">{escape(d['footer']['impressum_btn'])}</a>
+            <a href="/datenschutz" data-i18n="footer.privacy_btn">{escape(d['footer']['privacy_btn'])}</a>
           </div>
         </div>
 
@@ -827,9 +992,9 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
             <a href="#pathways">University (Bachelor / Master / PhD)</a>
             <a href="#pathways">Gymnasium &amp; Boarding (Internat)</a>
             <a href="#pathways">Studienkolleg (M / T / W / G-Kurs)</a>
-            <a href="#pathways">Duale Ausbildung (€1,000–€1,400/mo)</a>
-            <a href="#pathways">Sperrkonto (Fintiba / Expatrio)</a>
-            <a href="#pathways">Anmeldung &amp; Post-Arrival Berlin</a>
+            <a href="#pathways">Duale Ausbildung (€1,050–€1,400/mo)</a>
+            <a href="#cost-calculator">Sperrkonto (€992/mo = €11,904/yr)</a>
+            <a href="#visa-checklist">Free Visa Document Checklist</a>
           </div>
         </div>
 
@@ -837,13 +1002,13 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
           <h3 class="footer-title" data-i18n="footer.col_offices">{escape(d['footer']['col_offices'])}</h3>
           <div class="footer-office-box">
             <strong style="color:#FFFFFF;">🇩🇪 Berlin Headquarters:</strong><br />
-            {escape(SITE_CONFIG['address_berlin'])}<br />
-            Tel: <span dir="ltr">{escape(SITE_CONFIG['phone_de'])}</span>
+            {escape(SITE_CONFIG['street_address'])}, {escape(SITE_CONFIG['postal_city'])}<br />
+            Tel: <span dir="ltr">{escape(SITE_CONFIG['phone'])}</span>
           </div>
           <div class="footer-office-box">
             <strong style="color:#FFFFFF;">🌍 Regional Desks (Tehran &amp; Baku):</strong><br />
             {escape(SITE_CONFIG['address_tehran_baku'])}<br />
-            Email: {escape(SITE_CONFIG['email'])}
+            Email: <span dir="ltr">{escape(SITE_CONFIG['email'])}</span>
           </div>
         </div>
       </div>
@@ -851,8 +1016,8 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
       <div class="footer-bottom">
         <div data-i18n="footer.rights">{escape(d['footer']['rights'])}</div>
         <div class="footer-legal-links">
-          <button type="button" data-open-modal="impressum-modal" id="footer-impressum-btn" data-i18n="footer.impressum_btn">{escape(d['footer']['impressum_btn'])}</button>
-          <button type="button" data-open-modal="privacy-modal" id="footer-privacy-btn" data-i18n="footer.privacy_btn">{escape(d['footer']['privacy_btn'])}</button>
+          <a href="/impressum" id="footer-impressum-link" data-i18n="footer.impressum_btn">{escape(d['footer']['impressum_btn'])}</a>
+          <a href="/datenschutz" id="footer-privacy-link" data-i18n="footer.privacy_btn">{escape(d['footer']['privacy_btn'])}</a>
           <button type="button" id="open-cookie-settings" data-i18n="footer.cookie_settings_btn">{escape(d['footer']['cookie_settings_btn'])}</button>
         </div>
       </div>
@@ -934,74 +1099,6 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
   </div>
 
   <!-- ========================================================================
-       MODAL 2: GERMAN IMPRESSUM (§ 5 DDG / TMG Legal Compliance)
-       ======================================================================== -->
-  <div class="modal-backdrop" id="impressum-modal" role="dialog" aria-modal="true" aria-labelledby="impressum-modal-title">
-    <div class="modal-dialog legal-prose" dir="ltr" style="text-align:left;">
-      <div class="modal-header">
-        <h3 class="modal-title" id="impressum-modal-title" data-i18n="modals.impressum_title">{escape(d['modals']['impressum_title'])}</h3>
-        <button type="button" class="modal-close" data-close-modal aria-label="Close">✕</button>
-      </div>
-      <h4>Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</h4>
-      <p>
-        <strong>Sabke German Bildungs- &amp; Migrationsberatung GmbH</strong><br />
-        Kurfürstendamm 194<br />
-        10707 Berlin, Bundesrepublik Deutschland
-      </p>
-      <h4>Vertreten durch die Geschäftsführung</h4>
-      <p>Dr.-Ing. Pedram Rahimi &amp; Dipl.-Kfm. Lukas Weber</p>
-      <h4>Kontakt</h4>
-      <p>
-        Telefon: {escape(SITE_CONFIG['phone_de'])}<br />
-        E-Mail: {escape(SITE_CONFIG['email'])}<br />
-        Website: {escape(SITE_CONFIG['domain'])}
-      </p>
-      <h4>Registereintrag &amp; Umsatzsteuer-ID</h4>
-      <p>
-        Registergericht: Amtsgericht Charlottenburg (Berlin)<br />
-        Handelsregisternummer: HRB 249812 B<br />
-        Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz: DE358910421
-      </p>
-      <h4>Verbraucherstreitbeilegung / Universalschlichtungsstelle</h4>
-      <p>
-        Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: https://ec.europa.eu/consumers/odr/.
-        Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
-        Rechtsberatung im Sinne des Rechtsdienstleistungsgesetzes (RDG) wird ausschließlich durch kooperierende deutsche Fachanwälte für Migrationsrecht erbracht.
-      </p>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       MODAL 3: DATENSCHUTZERKLÄRUNG (GDPR / DSGVO Privacy Policy)
-       ======================================================================== -->
-  <div class="modal-backdrop" id="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
-    <div class="modal-dialog legal-prose" dir="ltr" style="text-align:left;">
-      <div class="modal-header">
-        <h3 class="modal-title" id="privacy-modal-title" data-i18n="modals.privacy_title">{escape(d['modals']['privacy_title'])}</h3>
-        <button type="button" class="modal-close" data-close-modal aria-label="Close">✕</button>
-      </div>
-      <h4>1. Datenschutz auf einen Blick (Art. 13 DSGVO / GDPR)</h4>
-      <p>
-        Der Schutz Ihrer personenbezogenen Daten hat für <strong>Sabke German</strong> höchste Priorität.
-        Alle Eingaben im interaktiven Eignungsrechner (Eligibility Calculator) werden ausschließlich lokal in Ihrem Browser (Client-Side) berechnet und erst dann übermittelt, wenn Sie aktiv auf den WhatsApp- oder E-Mail-Button klicken.
-      </p>
-      <h4>2. Verantwortliche Stelle</h4>
-      <p>
-        Sabke German Bildungs- &amp; Migrationsberatung GmbH, Kurfürstendamm 194, 10707 Berlin, Deutschland.
-        Datenschutzbeauftragter: datenschutz@sabkegerman.de
-      </p>
-      <h4>3. Lokale Speicherung (LocalStorage) &amp; Cookies</h4>
-      <p>
-        Diese Website nutzt ausschließlich technisch notwendige LocalStorage-Einträge (Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO sowie § 25 Abs. 2 TDDDG), um Ihre gewählte Sprache (<code>fa</code>, <code>de</code>, <code>en</code>, <code>az</code>), Ihr Farbschema (Dark/Light Mode) und Ihre Cookie-Einwilligung zu speichern. Es werden keine Werbe- oder Drittanbieter-Tracking-Cookies ohne Ihre ausdrückliche Zustimmung geladen.
-      </p>
-      <h4>4. Ihre Rechte nach DSGVO</h4>
-      <p>
-        Sie haben jederzeit das Recht auf unentgeltliche Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO) sowie Datenübertragbarkeit (Art. 20 DSGVO).
-      </p>
-    </div>
-  </div>
-
-  <!-- ========================================================================
        GDPR COOKIE CONSENT BANNER
        ======================================================================== -->
   <aside class="cookie-banner" id="cookie-banner" aria-label="Cookie Consent Banner">
@@ -1021,23 +1118,213 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
 """
 
 
+def render_legal_page_html(page_type: str) -> str:
+    """Renders dedicated /impressum/index.html or /datenschutz/index.html compliant with German DDG & GDPR."""
+    domain = SITE_CONFIG["domain"]
+    is_impressum = page_type == "impressum"
+    slug = "impressum" if is_impressum else "datenschutz"
+    title = (
+        f"Impressum (§ 5 DDG) | {SITE_CONFIG['legal_name']}"
+        if is_impressum
+        else f"Datenschutzerklärung (DSGVO / GDPR) | {SITE_CONFIG['legal_name']}"
+    )
+    description = (
+        f"Offizielles Impressum gemäß § 5 Digitale-Dienste-Gesetz (DDG) für {SITE_CONFIG['legal_name']} in Berlin."
+        if is_impressum
+        else f"Datenschutzerklärung gemäß DSGVO (GDPR) für {SITE_CONFIG['domain']} – Informationen zu Kontaktformular, PDF-Dokumenten-Upload und WhatsApp-Kommunikation."
+    )
+
+    if is_impressum:
+        body_content = f"""
+        <div class="eyebrow">RECHTLICHE ANGABEN • § 5 DDG / TMG</div>
+        <h1 class="section-title" style="text-align:left; margin-bottom:1.5rem;">Impressum (Legal Notice)</h1>
+
+        <div class="legal-page-card legal-prose">
+          <h4>1. Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</h4>
+          <p>
+            <strong>{escape(SITE_CONFIG['legal_name'])}</strong><br />
+            {escape(SITE_CONFIG['street_address'])}<br />
+            {escape(SITE_CONFIG['postal_city'])}
+          </p>
+
+          <h4>2. Vertreten durch die Geschäftsführung</h4>
+          <p>Dr.-Ing. Pedram Rahimi &amp; Dipl.-Kfm. Lukas Weber (Geschäftsführung / Managing Directors)</p>
+
+          <h4>3. Kontakt</h4>
+          <p>
+            Telefon: <a href="tel:{escape(SITE_CONFIG['phone'].replace(' ', ''))}">{escape(SITE_CONFIG['phone'])}</a><br />
+            WhatsApp Direktberatung: <a href="https://wa.me/{escape(SITE_CONFIG['whatsapp_number'])}" target="_blank" rel="noopener noreferrer">+{escape(SITE_CONFIG['whatsapp_number'])}</a><br />
+            E-Mail: <a href="mailto:{escape(SITE_CONFIG['email'])}">{escape(SITE_CONFIG['email'])}</a><br />
+            Website: <a href="{escape(domain)}">{escape(domain)}</a>
+          </p>
+
+          <h4>4. Registereintrag &amp; Umsatzsteuer-ID</h4>
+          <p>
+            Registergericht: Amtsgericht Charlottenburg (Berlin)<br />
+            Handelsregisternummer: HRB 249812 B (Platzhalter / i.G.)<br />
+            Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz: DE358910421
+          </p>
+
+          <h4>5. Inhaltlich Verantwortlicher gemäß § 18 Abs. 2 MStV</h4>
+          <p>
+            Dr.-Ing. Pedram Rahimi<br />
+            {escape(SITE_CONFIG['street_address'])}, {escape(SITE_CONFIG['postal_city'])}
+          </p>
+
+          <h4>6. Hinweis nach dem Rechtsdienstleistungsgesetz (RDG)</h4>
+          <p>
+            Sabke German erbringt akademische Bildungsberatung, Studienplatzvermittlung (Studienkolleg, Bachelor, Master), Ausbildungsplatzvermittlung sowie administrative Unterstützung bei Sperrkonto-Eröffnung und Einschreibung.
+            Rechtsberatung im Sinne des Rechtsdienstleistungsgesetzes (RDG) – insbesondere im Rahmen von Visum- und Aufenthaltsverfahren – erfolgt ausschließlich durch kooperierende, in Deutschland zugelassene Rechtsanwälte für Migrationsrecht.
+          </p>
+
+          <h4>7. EU-Streitschlichtung &amp; Verbraucherstreitbeilegung (§ 36 VSBG)</h4>
+          <p>
+            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:
+            <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr/</a>.<br />
+            Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
+          </p>
+        </div>
+        """
+    else:
+        body_content = f"""
+        <div class="eyebrow">DSGVO / GDPR • DATENSCHUTZ</div>
+        <h1 class="section-title" style="text-align:left; margin-bottom:1.5rem;">Datenschutzerklärung (Privacy Policy)</h1>
+
+        <div class="legal-page-card legal-prose">
+          <h4>1. Verantwortliche Stelle (Art. 4 Nr. 7 DSGVO)</h4>
+          <p>
+            Verantwortlich für die Datenverarbeitung auf dieser Website (<strong>{escape(domain)}</strong>) ist:<br />
+            <strong>{escape(SITE_CONFIG['legal_name'])}</strong><br />
+            {escape(SITE_CONFIG['street_address'])}, {escape(SITE_CONFIG['postal_city'])}<br />
+            Telefon: {escape(SITE_CONFIG['phone'])}<br />
+            E-Mail: <a href="mailto:{escape(SITE_CONFIG['email'])}">{escape(SITE_CONFIG['email'])}</a>
+          </p>
+
+          <h4>2. Hosting &amp; Vercel Web Analytics</h4>
+          <p>
+            Diese Website wird über <strong>Vercel Inc.</strong> bereitgestellt. Zur anonymisierten statistischen Auswertung und Optimierung unseres Webangebots nutzen wir <strong>Vercel Web Analytics</strong> (<code>/_vercel/insights/script.js</code>). Vercel Web Analytics verwendet keine Drittanbieter-Tracking-Cookies und speichert keine personenbezogenen IP-Profile (Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO).
+          </p>
+
+          <h4>3. Kontaktformular, Beratungsanfragen &amp; PDF-Dokumenten-Upload</h4>
+          <p>
+            Wenn Sie uns über das Beratungsformular (<code>#contact-consultation-form</code>) oder das Checklisten-Formular (<code>#checklist-lead-form</code>) kontaktieren, werden Ihre Angaben (Vollständiger Name, E-Mail-Adresse, WhatsApp-/Telefonnummer, gewünschter Bildungsweg, Nachricht sowie optional hochgeladene <strong>PDF-Bewerbungsunterlagen wie Zeugnisse oder Lebenslauf</strong> bis max. 10 MB) ausschließlich zum Zweck der Bearbeitung Ihrer Bildungsberatungsanfrage verarbeitet (Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO – vorvertragliche Maßnahmen – sowie Art. 6 Abs. 1 lit. a DSGVO).
+          </p>
+          <p>
+            <strong>Hinweis zum PDF-Upload:</strong> Die Dateiprüfung (Dateityp <code>.pdf</code> und Maximalgröße 10 MB) erfolgt zunächst lokal in Ihrem Browser. Erst mit dem Absenden des Formulars werden die Daten verschlüsselt (TLS/HTTPS) an unseren Formular-Endpunkt übermittelt und nach Abschluss der Beratung bzw. gemäß gesetzlichen Aufbewahrungsfristen gelöscht.
+          </p>
+
+          <h4>4. Direkte WhatsApp-Kommunikation</h4>
+          <p>
+            Auf unserer Website bieten wir direkte Links zur Kontaktaufnahme über <strong>WhatsApp</strong> (<code>https://wa.me/{escape(SITE_CONFIG['whatsapp_number'])}</code>, betrieben durch WhatsApp Ireland Limited, 4 Grand Canal Square, Dublin 2, Irland) an. Erst wenn Sie aktiv auf einen WhatsApp-Button klicken, werden Ihre Telefonnummer und der vorausgefüllte Begrüßungs- bzw. Auswertungstext an WhatsApp übertragen (Rechtsgrundlage: Art. 6 Abs. 1 lit. a und b DSGVO).
+          </p>
+
+          <h4>5. Interaktiver 4-Schritte-Eignungscheck &amp; Sperrkonto-Rechner</h4>
+          <p>
+            Alle Berechnungen im interaktiven Eignungscheck (<code>#assessment</code>) sowie im Sperrkonto- und Studienkostenrechner (<code>#cost-calculator</code>) finden zu 100 % lokal in Ihrem Webbrowser (Client-Side JavaScript) statt. Es erfolgt keine automatische Übertragung Ihrer Eingaben an Server, solange Sie diese nicht aktiv per Formular oder WhatsApp absenden.
+          </p>
+
+          <h4>6. Lokale Speicherung (LocalStorage)</h4>
+          <p>
+            Wir nutzen technisch notwendige LocalStorage-Einträge (gemäß § 25 Abs. 2 TDDDG und Art. 6 Abs. 1 lit. f DSGVO), um Ihre Spracheinstellung (<code>fa</code>, <code>de</code>, <code>en</code>, <code>az</code>), Ihr Darstellungsschema (Light/Dark Mode) und Ihre Cookie-Präferenz zu speichern.
+          </p>
+
+          <h4>7. Ihre Betroffenenrechte nach DSGVO (Art. 15–21 DSGVO)</h4>
+          <p>
+            Sie haben jederzeit das Recht auf unentgeltliche Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) sowie Widerspruch (Art. 21 DSGVO). Zudem besteht ein Beschwerderecht bei der Berliner Beauftragten für Datenschutz und Informationsfreiheit.
+          </p>
+        </div>
+        """
+
+    return f"""<!DOCTYPE html>
+<html lang="de" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{escape(title)}</title>
+  <meta name="description" content="{escape(description)}" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="{domain}/{slug}" />
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <div class="german-tricolor-bar" aria-hidden="true"></div>
+  <header class="site-header" id="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-logo" aria-label="Sabke German Home">
+        <img src="/assets/images/favicon.svg" alt="Sabke German Crest" class="brand-crest" width="42" height="42" />
+        <div class="brand-text">
+          <span class="brand-name">Sabke German</span>
+          <span class="brand-tagline">BILDUNGSAGENTUR • BERLIN</span>
+        </div>
+      </a>
+      <div class="header-controls">
+        <div class="lang-switcher" role="group" aria-label="Language Switcher">
+          <a href="/fa" class="lang-btn"><span class="lang-flag">🇮🇷</span><span>FA</span></a>
+          <a href="/de" class="lang-btn active"><span class="lang-flag">🇩🇪</span><span>DE</span></a>
+          <a href="/en" class="lang-btn"><span class="lang-flag">🇬🇧</span><span>EN</span></a>
+          <a href="/az" class="lang-btn"><span class="lang-flag">🇦🇿</span><span>AZ</span></a>
+        </div>
+        <a href="/#contact" class="btn btn-primary header-cta">Beratung buchen</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container" style="max-width: 860px;">
+      {body_content}
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="/" class="btn btn-primary">← Zurück zur Startseite / بازگشت به صفحه اصلی</a>
+        <a href="/{'datenschutz' if is_impressum else 'impressum'}" class="btn btn-outline">
+          {'Datenschutzerklärung (GDPR)' if is_impressum else 'Impressum (§ 5 DDG)'}
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none; padding-top:0;">
+        <div>© 2026 {escape(SITE_CONFIG['legal_name'])}. Alle Rechte vorbehalten.</div>
+        <div class="footer-legal-links">
+          <a href="/impressum">Impressum</a>
+          <a href="/datenschutz">Datenschutzerklärung</a>
+          <a href="/">Startseite</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
+"""
+
+
 def build_sitemap() -> str:
     domain = SITE_CONFIG["domain"]
-    routes = ["", "/fa", "/de", "/en", "/az"]
+    routes = ["", "/fa", "/de", "/en", "/az", "/impressum", "/datenschutz"]
     entries = []
     for r in routes:
         loc = f"{domain}{r}" if r else f"{domain}/"
-        entries.append(
-            f"""  <url>
-    <loc>{loc}</loc>
-    <lastmod>2026-11-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>{'1.0' if r in ('', '/fa') else '0.9'}</priority>
+        is_legal = r in ("/impressum", "/datenschutz")
+        prio = "1.0" if r in ("", "/fa") else ("0.6" if is_legal else "0.9")
+        hreflang_links = ""
+        if not is_legal:
+            hreflang_links = f"""
     <xhtml:link rel="alternate" hreflang="fa" href="{domain}/fa" />
     <xhtml:link rel="alternate" hreflang="de" href="{domain}/de" />
     <xhtml:link rel="alternate" hreflang="en" href="{domain}/en" />
     <xhtml:link rel="alternate" hreflang="az" href="{domain}/az" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="{domain}/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="{domain}/" />"""
+        entries.append(
+            f"""  <url>
+    <loc>{loc}</loc>
+    <lastmod>2026-11-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>{prio}</priority>{hreflang_links}
   </url>"""
         )
     return (
@@ -1047,6 +1334,51 @@ def build_sitemap() -> str:
         + "\n".join(entries)
         + "\n</urlset>\n"
     )
+
+
+def build_llms_txt() -> str:
+    domain = SITE_CONFIG["domain"]
+    return f"""# Sabke German (سبک ژرمن) — Educational & Vocational Migration to Germany
+
+> Official multilingual advisory agency headquartered in Berlin (`{SITE_CONFIG['street_address']}, {SITE_CONFIG['postal_city']}`) with regional desks in Tehran and Baku. Sabke German specializes in German public university admissions (Bachelor, Master, PhD), preparatory colleges (`Studienkolleg` M/T/W/G-Kurs), salaried vocational training (`Duale Ausbildung`), intensive German language visas, and Blocked Account (`Sperrkonto`) setup.
+
+## Primary Website & Language Editions
+- Canonical Root (Persian / RTL): {domain}/
+- Persian (`fa` — فارسی): {domain}/fa
+- German (`de` — Deutsch): {domain}/de
+- English (`en` — English): {domain}/en
+- Azerbaijani (`az` — Azərbaycan): {domain}/az
+
+## Core Educational & Migration Pathways in Germany
+1. **Studienkolleg (Preparatory College — M/T/W/G/S-Kurs)**:
+   - Target group: 12-year high school diploma holders seeking tuition-free German university admission.
+   - Requirements: High school diploma, German B1/B2 certificate, `Aufnahmetest` preparation, and €11,904/year Blocked Account (`Sperrkonto` at €992/month).
+2. **Bachelor's Degree (`Direct Bachelor` at German Public Universities)**:
+   - Target group: Applicants with direct university entrance qualification (`HZB`), 1 year of university study, or completed `Feststellungsprüfung (FSP)`.
+   - Requirements: German C1 (`TestDaF` / `DSH-2`) or IELTS 6.5+ (English tracks), €11,904/year `Sperrkonto`, statutory student health insurance (~€130/month), and ~€300/semester `Semesterbeitrag` (0€ tuition at public universities).
+3. **Master's Degree (`Master's Program` in English or German)**:
+   - Target group: Bachelor's graduates from `Anabin H+` recognized universities.
+   - Benefits: Tuition-free study at top public/TU9 universities, 20 hours/week student work permit, and 18-month post-graduation job-seeker residence permit.
+4. **Salaried Vocational Training (`Duale Ausbildung`)**:
+   - Target group: Applicants aged 18–34 with a high school diploma and German B1/B2 proficiency in Nursing (`Pflege`), IT, Mechatronics, Electrical Engineering, or Hospitality.
+   - Financial structure: Monthly gross training salary of €1,050 to €1,400 from month one; no €11,904 Blocked Account required when salary meets the statutory threshold.
+5. **Intensive German Language Course Visa (6–12 Months)**:
+   - Target group: Applicants starting German immersion in Berlin, Munich, Hamburg, or Frankfurt (minimum 18 lessons/week) prior to university or `Studienkolleg`.
+
+## Interactive Tools on {domain}
+- **4-Step Smart Pathway Assessment (`{domain}/#assessment`)**: Evaluates Academic GPA, Language Level, Current Education & Age, and Financial Readiness to recommend the optimal German pathway with one-click WhatsApp export and consultation form pre-filling.
+- **Blocked Account & Study Cost Calculator (`{domain}/#cost-calculator`)**: Calculates official 2026 German `Sperrkonto` deposits (€992/month = €5,952 for 6 months or €11,904 for 12 months), embassy visa fee (€75), student health insurance (~€130/month), and `Semesterbeitrag` (~€300/semester).
+- **Free Germany Student Visa Document Checklist (`{domain}/#visa-checklist`)**: Printable/PDF-ready 9-point embassy checklist covering VIDEX, passport, admission letter, `Sperrkonto`, translations, language certificates, CV/SOP, health insurance, and embassy fees.
+
+## Contact & Legal Compliance (German DDG & GDPR / DSGVO)
+- **Legal Entity**: {SITE_CONFIG['legal_name']}
+- **Berlin Address**: {SITE_CONFIG['street_address']}, {SITE_CONFIG['postal_city']}
+- **Official Email**: {SITE_CONFIG['email']}
+- **Phone (Berlin)**: {SITE_CONFIG['phone']}
+- **WhatsApp Direct Consultation**: https://wa.me/{SITE_CONFIG['whatsapp_number']}
+- **Impressum (§ 5 DDG)**: {domain}/impressum
+- **Privacy Policy (Datenschutzerklärung / GDPR)**: {domain}/datenschutz
+"""
 
 
 def main():
@@ -1073,20 +1405,35 @@ def main():
             f.write(html_content)
         print(f"✓ Generated /{lang}/index.html (dir={TRANSLATIONS[lang]['dir']})")
 
-    # 4. Write sitemap.xml
+    # 4. Write dedicated German legal pages (/impressum/index.html & /datenschutz/index.html)
+    for legal_slug in ("impressum", "datenschutz"):
+        legal_dir = os.path.join(ROOT_DIR, legal_slug)
+        os.makedirs(legal_dir, exist_ok=True)
+        legal_html = render_legal_page_html(legal_slug)
+        with open(os.path.join(legal_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(legal_html)
+        print(f"✓ Generated /{legal_slug}/index.html")
+
+    # 5. Write sitemap.xml
     with open(os.path.join(ROOT_DIR, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write(build_sitemap())
     print("✓ Generated /sitemap.xml")
 
-    # 5. Write robots.txt
+    # 6. Write robots.txt
     robots = f"""User-agent: *
 Allow: /
+Allow: /llms.txt
 
 Sitemap: {SITE_CONFIG['domain']}/sitemap.xml
 """
     with open(os.path.join(ROOT_DIR, "robots.txt"), "w", encoding="utf-8") as f:
         f.write(robots)
     print("✓ Generated /robots.txt")
+
+    # 7. Write llms.txt (AEO / AI Search Engine Optimization)
+    with open(os.path.join(ROOT_DIR, "llms.txt"), "w", encoding="utf-8") as f:
+        f.write(build_llms_txt())
+    print("✓ Generated /llms.txt")
 
 
 if __name__ == "__main__":

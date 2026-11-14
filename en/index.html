@@ -10,28 +10,29 @@
   <meta name="theme-color" content="#0F172A" />
 
   <!-- Canonical & Multilingual Hreflang Annotations -->
-  <link rel="canonical" href="https://sabkegerman.com/en" />
-  <link rel="alternate" hreflang="fa" href="https://sabkegerman.com/fa" />
-  <link rel="alternate" hreflang="de" href="https://sabkegerman.com/de" />
-  <link rel="alternate" hreflang="en" href="https://sabkegerman.com/en" />
-  <link rel="alternate" hreflang="az" href="https://sabkegerman.com/az" />
-  <link rel="alternate" hreflang="x-default" href="https://sabkegerman.com/" />
+  <link rel="canonical" href="https://www.sabkegerman.com/en" />
+  <link rel="alternate" hreflang="fa" href="https://www.sabkegerman.com/fa" />
+  <link rel="alternate" hreflang="de" href="https://www.sabkegerman.com/de" />
+  <link rel="alternate" hreflang="en" href="https://www.sabkegerman.com/en" />
+  <link rel="alternate" hreflang="az" href="https://www.sabkegerman.com/az" />
+  <link rel="alternate" hreflang="x-default" href="https://www.sabkegerman.com/" />
 
   <!-- OpenGraph / Social Metadata -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Sabke German (سبک ژرمن)" />
   <meta property="og:title" content="Sabke German | Premier German University Admission, Boarding School &amp; Ausbildung Agency" />
   <meta property="og:description" content="Build your future in Germany with Sabke German. End-to-end university admission (Bachelor, Master, PhD), high school boarding, Studienkolleg, salaried Ausbildung, Sperrkonto, and Berlin post-arrival VIP care." />
-  <meta property="og:url" content="https://sabkegerman.com/en" />
+  <meta property="og:url" content="https://www.sabkegerman.com/en" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="https://sabkegerman.com/assets/images/hero-campus.jpg" />
+  <meta property="og:image" content="https://www.sabkegerman.com/assets/images/hero-campus.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Sabke German | Premier German University Admission, Boarding School &amp; Ausbildung Agency" />
   <meta name="twitter:description" content="Build your future in Germany with Sabke German. End-to-end university admission (Bachelor, Master, PhD), high school boarding, Studienkolleg, salaried Ausbildung, Sperrkonto, and Berlin post-arrival VIP care." />
-  <meta name="twitter:image" content="https://sabkegerman.com/assets/images/hero-campus.jpg" />
+  <meta name="twitter:image" content="https://www.sabkegerman.com/assets/images/hero-campus.jpg" />
 
-  <!-- Favicon -->
+  <!-- Favicon & AI Discovery -->
   <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg" />
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt AI Guide" />
 
   <!-- Google Fonts: Vazirmatn (Persian RTL) + Plus Jakarta Sans & Inter (DE/EN/AZ LTR) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,18 +47,19 @@
 {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
-  "@id": "https://sabkegerman.com/#organization",
+  "@id": "https://www.sabkegerman.com/#organization",
   "name": "Sabke German (سبک ژرمن)",
+  "legalName": "Sabke German Bildungs- & Migrationsberatung GmbH",
   "alternateName": [
     "Sabke German",
     "سبک ژرمن",
     "Sabke German Bildungsberatung"
   ],
-  "url": "https://sabkegerman.com/en",
-  "logo": "https://sabkegerman.com/assets/images/favicon.svg",
-  "image": "https://sabkegerman.com/assets/images/hero-campus.jpg",
+  "url": "https://www.sabkegerman.com/en",
+  "logo": "https://www.sabkegerman.com/assets/images/favicon.svg",
+  "image": "https://www.sabkegerman.com/assets/images/hero-campus.jpg",
   "description": "Build your future in Germany with Sabke German. End-to-end university admission (Bachelor, Master, PhD), high school boarding, Studienkolleg, salaried Ausbildung, Sperrkonto, and Berlin post-arrival VIP care.",
-  "email": "beratung@sabkegerman.de",
+  "email": "info@sabkegerman.com",
   "telephone": "+49 30 5891 4420",
   "address": {
     "@type": "PostalAddress",
@@ -141,13 +143,16 @@
   ]
 }
 </script>
+
+  <!-- Vercel Web Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <!-- Subtle German Flag Top Accent Bar -->
   <div class="german-tricolor-bar" aria-hidden="true"></div>
 
   <!-- ========================================================================
-       STICKY HEADER & MULTILINGUAL NAVIGATION
+       STICKY HEADER & MULTILINGUAL NAVIGATION (3-Column Layout + 4x2 Nav Grid)
        ======================================================================== -->
   <header class="site-header" id="site-header">
     <div class="container header-inner">
@@ -162,7 +167,7 @@
       <nav class="main-nav nav-links" aria-label="Primary Navigation">
         <a href="#pathways" class="nav-link" data-i18n="nav.pathways">Study Pathways</a>
         <a href="#services" class="nav-link" data-i18n="nav.services">End-to-End Services</a>
-        <a href="#calculator" class="nav-link" data-i18n="nav.calculator">Eligibility Check</a>
+        <a href="#assessment" class="nav-link" data-i18n="nav.calculator">Eligibility Check</a>
         <a href="#roadmap" class="nav-link" data-i18n="nav.roadmap">Roadmap</a>
         <a href="#pricing" class="nav-link" data-i18n="nav.pricing">Packages</a>
         <a href="#stories" class="nav-link" data-i18n="nav.stories">Success Stories</a>
@@ -237,7 +242,7 @@
             <p class="hero-subtitle" data-i18n="hero.subtitle">From tuition-free admissions at top German public universities and elite boarding schools to salaried Ausbildung contracts—Sabke German guides you from initial profile strategy to airport pickup in Germany.</p>
 
             <div class="hero-actions">
-              <a href="#calculator" class="btn btn-primary" id="hero-cta-eligibility">
+              <a href="#assessment" class="btn btn-primary" id="hero-cta-eligibility">
                 <span data-i18n="hero.cta_primary">Free Eligibility Check</span>
                 <span class="dir-flip">→</span>
               </a>
@@ -311,7 +316,7 @@
     </section>
 
     <!-- ======================================================================
-         B. STUDY PATHWAYS IN GERMANY (Interactive Tabbed Detail View)
+         B. 5 CORE EDUCATIONAL & MIGRATION PATHWAYS (Interactive Tabs)
          ====================================================================== -->
     <section class="section" id="pathways">
       <div class="container">
@@ -372,13 +377,14 @@
             </ul>
             <div class="hero-actions" style="margin-bottom:0;">
               <button type="button" class="btn btn-primary" data-jump-calc="university" id="pathway-eval-cta">
-                <span>Check Eligibility for This Pathway</span>
+                <span data-i18n="pathways.cta_evaluate">Check Eligibility for This Pathway</span>
               </button>
               <button type="button" class="btn btn-outline" data-open-modal="consult-modal" data-preselect-pathway="University Admissions (Bachelor, Master &amp; PhD)" id="pathway-consult-cta">
-                <span>Speak with a Pathway Advisor</span>
+                <span data-i18n="pathways.cta_consult">Speak with a Pathway Advisor</span>
               </button>
             </div>
           </div>
+
           <div class="pathway-metrics-card">
             <img src="/assets/images/hero-campus.jpg" alt="University Admissions (Bachelor, Master &amp; PhD)" class="pathway-visual-img" loading="lazy" />
             <div class="pathway-metrics-body">
@@ -473,64 +479,143 @@
     </section>
 
     <!-- ======================================================================
-         D. INTERACTIVE SMART ELIGIBILITY CALCULATOR (4-Step Assessment Wizard)
+         D.1 INTERACTIVE 4-STEP SMART PATHWAY ASSESSMENT (ارزیابی هوشمند)
          ====================================================================== -->
-    <section class="section calculator-section" id="calculator">
+    <section class="section calculator-section" id="assessment">
+      <span id="calculator" aria-hidden="true"></span>
       <div class="container">
         <div class="section-header">
-          <div class="eyebrow" data-i18n="calculator.eyebrow">Interactive Smart Eligibility Calculator</div>
-          <h2 class="section-title" data-i18n="calculator.title">Calculate Your German Admission &amp; Visa Eligibility in 60 Seconds</h2>
-          <p class="section-subtitle" data-i18n="calculator.subtitle">Answer 4 quick questions to get your instant Eligibility Score (%), German GPA conversion, and tailored pathway recommendation.</p>
+          <div class="eyebrow" data-i18n="assessment.eyebrow">4-STEP SMART ASSESSMENT • 2026 ADMISSIONS ENGINE</div>
+          <h2 class="section-title" data-i18n="assessment.title">Find Your Ideal German Study or Career Pathway</h2>
+          <p class="section-subtitle" data-i18n="assessment.subtitle">Select your academic GPA, language level, current education, and financial readiness in 4 quick steps to receive a tailored pathway recommendation with exact requirements.</p>
         </div>
 
         <div class="wizard-card" id="wizard-card-container">
           <div class="wizard-progress">
             <button type="button" class="wizard-step-indicator active" data-goto-step="1">
               <span class="step-num">1</span>
-              <span>1. Select Goal</span>
+              <span>1. Academic GPA</span>
             </button>
             <button type="button" class="wizard-step-indicator " data-goto-step="2">
               <span class="step-num">2</span>
-              <span>2. Age &amp; GPA</span>
+              <span>2. Language Level</span>
             </button>
             <button type="button" class="wizard-step-indicator " data-goto-step="3">
               <span class="step-num">3</span>
-              <span>3. Language Level</span>
+              <span>3. Education &amp; Age</span>
             </button>
             <button type="button" class="wizard-step-indicator " data-goto-step="4">
               <span class="step-num">4</span>
-              <span>4. Financial Plan</span>
+              <span>4. Financial Readiness</span>
             </button>
           </div>
           <div class="wizard-step-pane active">
-            <h3 class="wizard-question-title">Step 1: What is your primary goal in Germany?</h3>
-            <p class="wizard-question-hint">Choose your target program so we evaluate the exact academic and consular criteria.</p>
+            <h3 class="wizard-question-title">1. What is your cumulative Academic GPA?</h3>
+            <p class="wizard-question-hint">Select your grade range on the 20-point scale (or international GPA equivalent):</p>
             <div class="wizard-options-grid">
-              <button type="button" class="wizard-option-card " data-select-goal="highschool">
-                <span class="option-title">High School &amp; Boarding</span>
-                <span class="option-sub">Gymnasium / Internat (Ages 13–18)</span>
+              <button type="button" class="wizard-option-card " data-select-gpa="below_14">
+                <span class="option-title">Below 14 (German Grade 3.1 – 4.0 / GPA &lt; 2.5)</span>
+                <span class="option-sub">Best suited for Paid Ausbildung or Foundation Language Pathway</span>
               </button>
-              <button type="button" class="wizard-option-card " data-select-goal="bachelor">
-                <span class="option-title">Bachelor’s &amp; Studienkolleg</span>
-                <span class="option-sub">Undergraduate / Foundation Year</span>
+              <button type="button" class="wizard-option-card " data-select-gpa="14_16">
+                <span class="option-title">14 – 16 (German Grade 2.3 – 3.0 / GPA 2.5–3.0)</span>
+                <span class="option-sub">Solid fit for Studienkolleg, Bachelor&#x27;s, and Duale Ausbildung</span>
               </button>
-              <button type="button" class="wizard-option-card selected" data-select-goal="master">
-                <span class="option-title">Master’s Degree</span>
-                <span class="option-sub">Tuition-free English or German programs</span>
+              <button type="button" class="wizard-option-card selected" data-select-gpa="16_18">
+                <span class="option-title">16 – 18 (German Grade 1.6 – 2.2 / GPA 3.1–3.6)</span>
+                <span class="option-sub">High admission probability at tuition-free German public universities</span>
               </button>
-              <button type="button" class="wizard-option-card " data-select-goal="phd">
-                <span class="option-title">PhD &amp; Research</span>
-                <span class="option-sub">Doctoral positions with monthly salary</span>
-              </button>
-              <button type="button" class="wizard-option-card " data-select-goal="ausbildung">
-                <span class="option-title">Ausbildung (Vocational)</span>
-                <span class="option-sub">Earn €1,000–€1,400/month while training</span>
+              <button type="button" class="wizard-option-card " data-select-gpa="above_18">
+                <span class="option-title">Above 18 (German Grade 1.0 – 1.5 / GPA 3.7+)</span>
+                <span class="option-sub">Top candidate for TU9 Universities, Medicine &amp; DAAD Scholarships</span>
               </button>
             </div>
           </div>
           <div class="wizard-footer">
             <span></span>
-            <button type="button" class="btn btn-primary" id="wizard-next-btn">Next Step</button>
+            <button type="button" class="btn btn-primary" id="wizard-next-btn">Next Step →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         D.2 INTERACTIVE BLOCKED ACCOUNT & GERMANY STUDY COST CALCULATOR (ماشینحساب تمکن مالی)
+         ====================================================================== -->
+    <section class="section section-alt cost-calc-section" id="cost-calculator">
+      <div class="container">
+        <div class="section-header">
+          <div class="eyebrow" data-i18n="cost_calc.eyebrow">SPERRKONTO &amp; GERMANY STUDY COST CALCULATOR • 2026 RATES</div>
+          <h2 class="section-title" data-i18n="cost_calc.title">Interactive Blocked Account &amp; Study Budget Calculator</h2>
+          <p class="section-subtitle" data-i18n="cost_calc.subtitle">Select your target pathway (Studienkolleg, Bachelor, Master, or Ausbildung) and duration (6 or 12 months) to calculate the exact Blocked Account requirement (€992/month = €11,904/year), embassy visa fee, health insurance, and semester contribution.</p>
+        </div>
+
+        <div class="cost-calc-card" id="cost-calc-card">
+          <div class="cost-controls-grid">
+            <div class="cost-control-group">
+              <label class="cost-control-label" data-i18n="cost_calc.pathway_label">1. Select Target Pathway:</label>
+              <div class="cost-pills-row" id="cost-pathway-pills">
+              <button type="button" class="cost-pill-btn " data-cost-pathway="Studienkolleg">Studienkolleg</button>
+              <button type="button" class="cost-pill-btn " data-cost-pathway="Bachelor">Bachelor</button>
+              <button type="button" class="cost-pill-btn active" data-cost-pathway="Master">Master</button>
+              <button type="button" class="cost-pill-btn " data-cost-pathway="Ausbildung">Ausbildung (Salaried)</button>
+              </div>
+            </div>
+
+            <div class="cost-control-group">
+              <label class="cost-control-label" data-i18n="cost_calc.duration_label">2. Select Duration:</label>
+              <div class="cost-pills-row" id="cost-duration-pills">
+                <button type="button" class="cost-pill-btn" data-cost-months="6" data-i18n="cost_calc.months_6">6 Months (1 Semester)</button>
+                <button type="button" class="cost-pill-btn active" data-cost-months="12" data-i18n="cost_calc.months_12">12 Months (Full Year)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cost-breakdown-panel" id="cost-breakdown-panel">
+            <div class="cost-items-list">
+              <div class="cost-line-item highlight">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.sperrkonto_label">Blocked Account / Sperrkonto (€992 / month official rate)</div>
+                  <div class="cost-line-sub" id="cost-sperrkonto-sub" data-i18n="cost_calc.sperrkonto_sub">Held in your personal German account and paid out at €992/month for living expenses</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-sperrkonto" dir="ltr">€11,904</div>
+              </div>
+
+              <div class="cost-line-item">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.insurance_label">German Student Health Insurance (Krankenversicherung)</div>
+                  <div class="cost-line-sub" data-i18n="cost_calc.insurance_sub">~€130/month statutory student insurance (covered via payroll for Ausbildung)</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-insurance" dir="ltr">€1,560</div>
+              </div>
+
+              <div class="cost-line-item">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.semester_label">University Semester Contribution (Semesterbeitrag)</div>
+                  <div class="cost-line-sub" data-i18n="cost_calc.semester_sub">~€300/semester admin &amp; public transit pass (0€ tuition at public universities)</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-semester" dir="ltr">€600</div>
+              </div>
+
+              <div class="cost-line-item">
+                <div>
+                  <div class="cost-line-title" data-i18n="cost_calc.visa_fee_label">German Embassy National D-Visa Fee</div>
+                  <div class="cost-line-sub" data-i18n="cost_calc.visa_fee_sub">Official one-time embassy visa processing fee (€75)</div>
+                </div>
+                <div class="cost-line-amount" id="cost-val-visa" dir="ltr">€75</div>
+              </div>
+            </div>
+
+            <div class="cost-summary-box">
+              <div>
+                <div class="cost-total-caption" data-i18n="cost_calc.total_label">Total Estimated Upfront Budget (EUR)</div>
+                <div class="cost-total-number" id="cost-val-total" dir="ltr">€14,139</div>
+                <p class="cost-total-note" id="cost-total-note" data-i18n="cost_calc.total_note_study">Note: The €11,904 Sperrkonto amount is not a fee—it remains your own money in Germany and is released back to you in monthly €992 installments.</p>
+              </div>
+              <a href="#contact" class="btn btn-primary" id="cost-calc-cta-btn" style="width:100%; justify-content:center;">
+                <span data-i18n="cost_calc.cta_btn">Get Help Opening Your Sperrkonto (Fintiba / Expatrio)</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -857,9 +942,121 @@
     </section>
 
     <!-- ======================================================================
+         G.3 LEAD MAGNET: FREE GERMANY STUDENT VISA DOCUMENT CHECKLIST
+         ====================================================================== -->
+    <section class="section checklist-lead-section" id="visa-checklist">
+      <div class="container">
+        <div class="checklist-lead-card">
+          <div class="checklist-lead-top">
+            <div class="checklist-lead-copy">
+              <div class="eyebrow" data-i18n="checklist_lead.eyebrow">FREE EMBASSY RESOURCE • 2026 VISA CHECKLIST</div>
+              <h2 class="section-title" style="margin-bottom:0.75rem;" data-i18n="checklist_lead.title">Download Free Germany Student Visa Document Checklist</h2>
+              <p class="section-subtitle" style="margin-bottom:1rem;" data-i18n="checklist_lead.subtitle">Enter your Name and Email or WhatsApp number to immediately unlock our complete, printable PDF-ready German Embassy Visa Document Checklist (University, Studienkolleg &amp; Ausbildung).</p>
+              <span class="pathway-pill pathway-pill-gold" data-i18n="checklist_lead.badge">✦ Updated for 2026 German Embassy &amp; Consular Requirements</span>
+            </div>
+
+            <form id="checklist-lead-form" class="checklist-lead-form" action="YOUR_FORM_ENDPOINT_URL" method="POST" novalidate>
+              <input type="hidden" name="lead_type" value="visa_checklist" />
+              <div class="contact-field-group">
+                <label class="contact-label" for="checklist-lead-name" data-i18n="checklist_lead.name_label">Full Name *</label>
+                <input type="text" id="checklist-lead-name" name="full_name" class="contact-input" required placeholder="e.g. Sara Mohammadi" data-i18n-placeholder="checklist_lead.name_placeholder" />
+              </div>
+              <div class="contact-field-group">
+                <label class="contact-label" for="checklist-lead-contact" data-i18n="checklist_lead.contact_label">Email Address or WhatsApp Number *</label>
+                <input type="text" id="checklist-lead-contact" name="email_or_whatsapp" class="contact-input" required dir="ltr" placeholder="name@example.com / +49..." data-i18n-placeholder="checklist_lead.contact_placeholder" />
+              </div>
+              <button type="submit" class="btn btn-primary" id="checklist-unlock-btn" style="width:100%; justify-content:center;">
+                <span data-i18n="checklist_lead.submit_btn">Unlock Free Visa Checklist (Printable PDF)</span>
+              </button>
+              <p class="contact-privacy-note" style="text-align:center;" data-i18n="checklist_lead.privacy_hint">Protected under German GDPR (DSGVO). Zero spam.</p>
+            </form>
+          </div>
+
+          <!-- Unlocked Printable / PDF-Ready Checklist Panel -->
+          <div class="checklist-unlocked-panel" id="checklist-unlocked-panel" hidden>
+            <div class="checklist-unlocked-header">
+              <div>
+                <h3 class="checklist-unlocked-title" data-i18n="checklist_lead.unlocked_title">Official Germany Student &amp; Ausbildung Visa Checklist (2026)</h3>
+                <p class="checklist-unlocked-sub" data-i18n="checklist_lead.unlocked_subtitle">Check off your completed documents below and click Print / Save as PDF to keep a copy:</p>
+              </div>
+              <button type="button" class="btn btn-primary" id="checklist-print-btn">
+                <span data-i18n="checklist_lead.print_btn">Print / Save Checklist as PDF 🖨</span>
+              </button>
+            </div>
+            <div class="checklist-docs-grid" id="checklist-docs-grid">
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">1. National Visa Application Form (VIDEX) &amp; 2 Biometric Photos</div>
+                  <div class="checklist-doc-detail">Completed and signed long-stay D-Visa VIDEX form + 2 recent biometric photos (35×45 mm).</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">2. Valid Passport (Minimum 12 Months Validity)</div>
+                  <div class="checklist-doc-detail">Signed passport with at least 2 blank pages + 2 unstapled A4 copies of the bio data page.</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">3. Official University / Studienkolleg Admission Letter or Ausbildung Contract</div>
+                  <div class="checklist-doc-detail">Unconditional/conditional Zulassungsbescheid or signed Ausbildungsvertrag with ZAV pre-approval.</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">4. Proof of Financial Means (Sperrkonto — €11,904 / year)</div>
+                  <div class="checklist-doc-detail">Official Fintiba or Expatrio blocking confirmation (€992/month) or salaried Ausbildung contract.</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">5. Certified &amp; Legalized Academic Transcripts and Diplomas</div>
+                  <div class="checklist-doc-detail">Original certificates + certified German/English translations of High School Diploma &amp; Bachelor&#x27;s degree.</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">6. Recognized Language Proficiency Certificate</div>
+                  <div class="checklist-doc-detail">Official Goethe, telc, ÖSD, TestDaF, DSH, or IELTS / TOEFL certificate matching your admission letter.</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">7. Gap-Free Tabular CV (Europass) &amp; Statement of Purpose (SOP)</div>
+                  <div class="checklist-doc-detail">Signed motivation letter detailing your academic rationale and post-graduation career plan.</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">8. Incoming Travel Insurance &amp; German Statutory Student Health Insurance</div>
+                  <div class="checklist-doc-detail">€30,000 coverage for initial arrival + German public student insurance confirmation (TK / AOK / DAK).</div>
+                </div>
+              </label>
+              <label class="checklist-doc-item">
+                <input type="checkbox" class="checklist-doc-checkbox" checked />
+                <div class="checklist-doc-body">
+                  <div class="checklist-doc-title">9. Embassy Visa Fee (€75) &amp; Appointment Confirmation</div>
+                  <div class="checklist-doc-detail">Printed appointment confirmation + 2 complete sets of A4 photocopies sorted in embassy order.</div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
          H. CONTACT, CONSULTATION & PDF DOCUMENT UPLOAD SECTION
          ====================================================================== -->
-    <section class="section contact-section" id="contact">
+    <section class="section section-alt contact-section" id="contact">
       <div class="container">
         <div class="section-header">
           <div class="eyebrow" data-i18n="contact.eyebrow">Direct Contact &amp; Document Assessment</div>
@@ -905,7 +1102,7 @@
                 <span class="contact-info-icon">✉️</span>
                 <div>
                   <div class="contact-info-label">Official Admissions Desk</div>
-                  <div class="contact-info-val" dir="ltr">beratung@sabkegerman.de</div>
+                  <div class="contact-info-val" dir="ltr">info@sabkegerman.com</div>
                 </div>
               </div>
               <div class="contact-info-item">
@@ -1014,7 +1211,7 @@
   </main>
 
   <!-- ========================================================================
-       FOOTER & GERMAN LEGAL COMPLIANCE LINKS (Impressum & GDPR)
+       FOOTER & GERMAN LEGAL COMPLIANCE LINKS (Impressum & Datenschutzerklärung)
        ======================================================================== -->
   <footer class="site-footer">
     <div class="container">
@@ -1043,11 +1240,12 @@
           <div class="footer-links">
             <a href="#pathways" data-i18n="nav.pathways">Study Pathways</a>
             <a href="#services" data-i18n="nav.services">End-to-End Services</a>
-            <a href="#calculator" data-i18n="nav.calculator">Eligibility Check</a>
-            <a href="#roadmap" data-i18n="nav.roadmap">Roadmap</a>
-            <a href="#pricing" data-i18n="nav.pricing">Packages</a>
-            <a href="#faq" data-i18n="nav.faq">FAQ</a>
+            <a href="#assessment" data-i18n="nav.calculator">Eligibility Check</a>
+            <a href="#cost-calculator" data-i18n="cost_calc.title">Interactive Blocked Account &amp; Study Budget Calculator</a>
+            <a href="#visa-checklist" data-i18n="checklist_lead.title">Download Free Germany Student Visa Document Checklist</a>
             <a href="#contact" data-i18n="nav.contact">Contact &amp; Upload</a>
+            <a href="/impressum" data-i18n="footer.impressum_btn">Impressum (Legal Notice)</a>
+            <a href="/datenschutz" data-i18n="footer.privacy_btn">Datenschutzerklärung (GDPR Privacy)</a>
           </div>
         </div>
 
@@ -1057,9 +1255,9 @@
             <a href="#pathways">University (Bachelor / Master / PhD)</a>
             <a href="#pathways">Gymnasium &amp; Boarding (Internat)</a>
             <a href="#pathways">Studienkolleg (M / T / W / G-Kurs)</a>
-            <a href="#pathways">Duale Ausbildung (€1,000–€1,400/mo)</a>
-            <a href="#pathways">Sperrkonto (Fintiba / Expatrio)</a>
-            <a href="#pathways">Anmeldung &amp; Post-Arrival Berlin</a>
+            <a href="#pathways">Duale Ausbildung (€1,050–€1,400/mo)</a>
+            <a href="#cost-calculator">Sperrkonto (€992/mo = €11,904/yr)</a>
+            <a href="#visa-checklist">Free Visa Document Checklist</a>
           </div>
         </div>
 
@@ -1073,7 +1271,7 @@
           <div class="footer-office-box">
             <strong style="color:#FFFFFF;">🌍 Regional Desks (Tehran &amp; Baku):</strong><br />
             Tehran (Jordan Blvd, Tower B) &amp; Baku (Nizami St 90A, Landmark III)<br />
-            Email: beratung@sabkegerman.de
+            Email: <span dir="ltr">info@sabkegerman.com</span>
           </div>
         </div>
       </div>
@@ -1081,8 +1279,8 @@
       <div class="footer-bottom">
         <div data-i18n="footer.rights">© 2026 Sabke German. All rights reserved.</div>
         <div class="footer-legal-links">
-          <button type="button" data-open-modal="impressum-modal" id="footer-impressum-btn" data-i18n="footer.impressum_btn">Impressum (Legal Notice)</button>
-          <button type="button" data-open-modal="privacy-modal" id="footer-privacy-btn" data-i18n="footer.privacy_btn">Datenschutzerklärung (GDPR Privacy)</button>
+          <a href="/impressum" id="footer-impressum-link" data-i18n="footer.impressum_btn">Impressum (Legal Notice)</a>
+          <a href="/datenschutz" id="footer-privacy-link" data-i18n="footer.privacy_btn">Datenschutzerklärung (GDPR Privacy)</a>
           <button type="button" id="open-cookie-settings" data-i18n="footer.cookie_settings_btn">Cookie Preferences</button>
         </div>
       </div>
@@ -1160,74 +1358,6 @@
           </button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       MODAL 2: GERMAN IMPRESSUM (§ 5 DDG / TMG Legal Compliance)
-       ======================================================================== -->
-  <div class="modal-backdrop" id="impressum-modal" role="dialog" aria-modal="true" aria-labelledby="impressum-modal-title">
-    <div class="modal-dialog legal-prose" dir="ltr" style="text-align:left;">
-      <div class="modal-header">
-        <h3 class="modal-title" id="impressum-modal-title" data-i18n="modals.impressum_title">Impressum — Legal Disclosure Pursuant to § 5 DDG (Germany)</h3>
-        <button type="button" class="modal-close" data-close-modal aria-label="Close">✕</button>
-      </div>
-      <h4>Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</h4>
-      <p>
-        <strong>Sabke German Bildungs- &amp; Migrationsberatung GmbH</strong><br />
-        Kurfürstendamm 194<br />
-        10707 Berlin, Bundesrepublik Deutschland
-      </p>
-      <h4>Vertreten durch die Geschäftsführung</h4>
-      <p>Dr.-Ing. Pedram Rahimi &amp; Dipl.-Kfm. Lukas Weber</p>
-      <h4>Kontakt</h4>
-      <p>
-        Telefon: +49 30 5891 4420<br />
-        E-Mail: beratung@sabkegerman.de<br />
-        Website: https://sabkegerman.com
-      </p>
-      <h4>Registereintrag &amp; Umsatzsteuer-ID</h4>
-      <p>
-        Registergericht: Amtsgericht Charlottenburg (Berlin)<br />
-        Handelsregisternummer: HRB 249812 B<br />
-        Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz: DE358910421
-      </p>
-      <h4>Verbraucherstreitbeilegung / Universalschlichtungsstelle</h4>
-      <p>
-        Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: https://ec.europa.eu/consumers/odr/.
-        Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
-        Rechtsberatung im Sinne des Rechtsdienstleistungsgesetzes (RDG) wird ausschließlich durch kooperierende deutsche Fachanwälte für Migrationsrecht erbracht.
-      </p>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       MODAL 3: DATENSCHUTZERKLÄRUNG (GDPR / DSGVO Privacy Policy)
-       ======================================================================== -->
-  <div class="modal-backdrop" id="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
-    <div class="modal-dialog legal-prose" dir="ltr" style="text-align:left;">
-      <div class="modal-header">
-        <h3 class="modal-title" id="privacy-modal-title" data-i18n="modals.privacy_title">Datenschutzerklärung — GDPR Privacy Policy (DSGVO)</h3>
-        <button type="button" class="modal-close" data-close-modal aria-label="Close">✕</button>
-      </div>
-      <h4>1. Datenschutz auf einen Blick (Art. 13 DSGVO / GDPR)</h4>
-      <p>
-        Der Schutz Ihrer personenbezogenen Daten hat für <strong>Sabke German</strong> höchste Priorität.
-        Alle Eingaben im interaktiven Eignungsrechner (Eligibility Calculator) werden ausschließlich lokal in Ihrem Browser (Client-Side) berechnet und erst dann übermittelt, wenn Sie aktiv auf den WhatsApp- oder E-Mail-Button klicken.
-      </p>
-      <h4>2. Verantwortliche Stelle</h4>
-      <p>
-        Sabke German Bildungs- &amp; Migrationsberatung GmbH, Kurfürstendamm 194, 10707 Berlin, Deutschland.
-        Datenschutzbeauftragter: datenschutz@sabkegerman.de
-      </p>
-      <h4>3. Lokale Speicherung (LocalStorage) &amp; Cookies</h4>
-      <p>
-        Diese Website nutzt ausschließlich technisch notwendige LocalStorage-Einträge (Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO sowie § 25 Abs. 2 TDDDG), um Ihre gewählte Sprache (<code>fa</code>, <code>de</code>, <code>en</code>, <code>az</code>), Ihr Farbschema (Dark/Light Mode) und Ihre Cookie-Einwilligung zu speichern. Es werden keine Werbe- oder Drittanbieter-Tracking-Cookies ohne Ihre ausdrückliche Zustimmung geladen.
-      </p>
-      <h4>4. Ihre Rechte nach DSGVO</h4>
-      <p>
-        Sie haben jederzeit das Recht auf unentgeltliche Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO) sowie Datenübertragbarkeit (Art. 20 DSGVO).
-      </p>
     </div>
   </div>
 
