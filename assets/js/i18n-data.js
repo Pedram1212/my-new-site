@@ -25,14 +25,14 @@ window.SABKE_I18N = {
       "brand_name": "سبک ژرمن",
       "brand_tagline": "SABKE GERMAN • BERLIN",
       "pathways": "مسیرهای تحصیلی",
-      "services": "خدمات",
+      "services": "خدمات صفر تا صد",
       "calculator": "ارزیابی هوشمند",
       "roadmap": "نقشه راه",
       "pricing": "پکیجها",
       "stories": "پروندههای موفق",
       "faq": "سوالات متداول",
-      "contact": "تماس با ما",
-      "cta_book": "مشاوره رایگان"
+      "contact": "تماس و ارسال مدارک",
+      "cta_book": "رزرو وقت مشاوره"
     },
     "hero": {
       "kicker": "دفتر رسمی مشاوره آموزشی در برلین، تهران و باکو",
@@ -642,14 +642,14 @@ window.SABKE_I18N = {
       "brand_name": "Sabke German",
       "brand_tagline": "BILDUNGSAGENTUR • BERLIN",
       "pathways": "Bildungswege",
-      "services": "Leistungen",
-      "calculator": "Eignungscheck",
-      "roadmap": "Ablauf",
+      "services": "Rundum-Service",
+      "calculator": "Chancen-Rechner",
+      "roadmap": "Ablaufplan",
       "pricing": "Pakete",
-      "stories": "Erfolge",
+      "stories": "Erfolgsgeschichten",
       "faq": "FAQ",
-      "contact": "Kontakt",
-      "cta_book": "Gratis Beratung"
+      "contact": "Kontakt & Upload",
+      "cta_book": "Beratung buchen"
     },
     "hero": {
       "kicker": "Offizielle Bildungs- & Migrationsberatung in Berlin, Teheran & Baku",
@@ -1258,15 +1258,15 @@ window.SABKE_I18N = {
     "nav": {
       "brand_name": "Sabke German",
       "brand_tagline": "EDUCATION & MIGRATION • BERLIN",
-      "pathways": "Pathways",
-      "services": "Services",
-      "calculator": "Assessment",
+      "pathways": "Study Pathways",
+      "services": "End-to-End Services",
+      "calculator": "Eligibility Check",
       "roadmap": "Roadmap",
       "pricing": "Packages",
-      "stories": "Stories",
+      "stories": "Success Stories",
       "faq": "FAQ",
-      "contact": "Contact",
-      "cta_book": "Free Consult"
+      "contact": "Contact & Upload",
+      "cta_book": "Book Consultation"
     },
     "hero": {
       "kicker": "Official Academic & Vocational Migration Offices in Berlin, Tehran & Baku",
@@ -1875,15 +1875,15 @@ window.SABKE_I18N = {
     "nav": {
       "brand_name": "Sabke German",
       "brand_tagline": "TƏHSİL VƏ MİQRASİYA • BERLİN",
-      "pathways": "Təhsil Yolları",
-      "services": "Xidmətlər",
-      "calculator": "Qiymətləndirmə",
+      "pathways": "Təhsil İstiqamətləri",
+      "services": "Tam Xidmətlər",
+      "calculator": "Şans Hesablayıcısı",
       "roadmap": "Yol Xəritəsi",
       "pricing": "Paketlər",
-      "stories": "Uğurlar",
-      "faq": "FAQ",
-      "contact": "Əlaqə",
-      "cta_book": "Pulsuz Məsləhət"
+      "stories": "Uğur Hekayələri",
+      "faq": "Suallar (FAQ)",
+      "contact": "Əlaqə və Sənədlər",
+      "cta_book": "Konsultasiya Bron Et"
     },
     "hero": {
       "kicker": "Berlin, Bakı və Tehranda Rəsmi Təhsil və Miqrasiya Nümayəndəliyi",
