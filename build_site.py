@@ -296,7 +296,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
         </div>
       </a>
 
-      <nav class="main-nav" aria-label="Primary Navigation">
+      <nav class="main-nav nav-links" aria-label="Primary Navigation">
         <a href="#pathways" class="nav-link" data-i18n="nav.pathways">{escape(d['nav']['pathways'])}</a>
         <a href="#services" class="nav-link" data-i18n="nav.services">{escape(d['nav']['services'])}</a>
         <a href="#calculator" class="nav-link" data-i18n="nav.calculator">{escape(d['nav']['calculator'])}</a>
@@ -305,23 +305,59 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
         <a href="#stories" class="nav-link" data-i18n="nav.stories">{escape(d['nav']['stories'])}</a>
         <a href="#faq" class="nav-link" data-i18n="nav.faq">{escape(d['nav']['faq'])}</a>
         <a href="#contact" class="nav-link" data-i18n="nav.contact">{escape(d['nav']['contact'])}</a>
+
+        <!-- 4-Button Language Switcher & CTA inside Mobile Menu Drawer -->
+        <div class="mobile-drawer-footer">
+          <div class="lang-switcher mobile-lang-switcher" role="group" aria-label="Language Switcher">
+            <a href="/fa" class="lang-btn {'active' if lang_code == 'fa' else ''}" data-lang="fa" title="فارسی (Persian)">
+              <span class="lang-flag">🇮🇷</span><span>FA</span>
+            </a>
+            <a href="/de" class="lang-btn {'active' if lang_code == 'de' else ''}" data-lang="de" title="Deutsch (German)">
+              <span class="lang-flag">🇩🇪</span><span>DE</span>
+            </a>
+            <a href="/en" class="lang-btn {'active' if lang_code == 'en' else ''}" data-lang="en" title="English">
+              <span class="lang-flag">🇬🇧</span><span>EN</span>
+            </a>
+            <a href="/az" class="lang-btn {'active' if lang_code == 'az' else ''}" data-lang="az" title="Azərbaycan">
+              <span class="lang-flag">🇦🇿</span><span>AZ</span>
+            </a>
+          </div>
+          <button type="button" class="btn btn-primary mobile-drawer-cta" data-open-modal="consult-modal">
+            <span data-i18n="nav.cta_book">{escape(d['nav']['cta_book'])}</span>
+          </button>
+        </div>
       </nav>
 
       <div class="header-controls">
-        <!-- 4-Language Switcher (FA | DE | EN | AZ) -->
-        <div class="lang-switcher" role="group" aria-label="Language Switcher">
-          <a href="/fa" class="lang-btn {'active' if lang_code == 'fa' else ''}" data-lang="fa" id="lang-switch-fa" title="فارسی (Persian)">
-            <span class="lang-flag">🇮🇷</span><span>FA</span>
-          </a>
-          <a href="/de" class="lang-btn {'active' if lang_code == 'de' else ''}" data-lang="de" id="lang-switch-de" title="Deutsch (German)">
-            <span class="lang-flag">🇩🇪</span><span>DE</span>
-          </a>
-          <a href="/en" class="lang-btn {'active' if lang_code == 'en' else ''}" data-lang="en" id="lang-switch-en" title="English">
-            <span class="lang-flag">🇬🇧</span><span>EN</span>
-          </a>
-          <a href="/az" class="lang-btn {'active' if lang_code == 'az' else ''}" data-lang="az" id="lang-switch-az" title="Azərbaycan">
-            <span class="lang-flag">🇦🇿</span><span>AZ</span>
-          </a>
+        <!-- Compact Accessible Language Dropdown Selector (🌐 FA ▾) -->
+        <div class="lang-dropdown" id="lang-dropdown">
+          <button type="button" class="lang-dropdown-toggle" id="lang-dropdown-btn" aria-haspopup="true" aria-expanded="false" aria-label="Select Language">
+            <span class="lang-globe-icon" aria-hidden="true">🌐</span>
+            <span class="lang-current-code" id="lang-current-code">{lang_code.upper()}</span>
+            <span class="lang-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="menu" aria-label="Language Selector">
+            <a href="/fa" role="menuitem" class="lang-btn lang-dropdown-item {'active' if lang_code == 'fa' else ''}" data-lang="fa" id="lang-switch-fa" title="فارسی (Persian)">
+              <span class="lang-flag">🇮🇷</span>
+              <span class="lang-item-name">فارسی</span>
+              <span class="lang-item-code">FA</span>
+            </a>
+            <a href="/de" role="menuitem" class="lang-btn lang-dropdown-item {'active' if lang_code == 'de' else ''}" data-lang="de" id="lang-switch-de" title="Deutsch (German)">
+              <span class="lang-flag">🇩🇪</span>
+              <span class="lang-item-name">Deutsch</span>
+              <span class="lang-item-code">DE</span>
+            </a>
+            <a href="/en" role="menuitem" class="lang-btn lang-dropdown-item {'active' if lang_code == 'en' else ''}" data-lang="en" id="lang-switch-en" title="English">
+              <span class="lang-flag">🇬🇧</span>
+              <span class="lang-item-name">English</span>
+              <span class="lang-item-code">EN</span>
+            </a>
+            <a href="/az" role="menuitem" class="lang-btn lang-dropdown-item {'active' if lang_code == 'az' else ''}" data-lang="az" id="lang-switch-az" title="Azərbaycan">
+              <span class="lang-flag">🇦🇿</span>
+              <span class="lang-item-name">Azərbaycan</span>
+              <span class="lang-item-code">AZ</span>
+            </a>
+          </div>
         </div>
 
         <!-- Dark / Light Mode Toggle -->
@@ -346,7 +382,7 @@ def render_page_html(lang_code: str, is_root: bool = False) -> str:
           <span data-i18n="nav.cta_book">{escape(d['nav']['cta_book'])}</span>
         </button>
 
-        <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Navigation Menu">
+        <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Navigation Menu" aria-expanded="false">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="12" x2="21" y2="12"></line>

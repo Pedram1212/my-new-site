@@ -159,32 +159,68 @@
         </div>
       </a>
 
-      <nav class="main-nav" aria-label="Primary Navigation">
-        <a href="#pathways" class="nav-link" data-i18n="nav.pathways">Təhsil İstiqamətləri</a>
-        <a href="#services" class="nav-link" data-i18n="nav.services">Tam Xidmətlər</a>
-        <a href="#calculator" class="nav-link" data-i18n="nav.calculator">Şans Hesablayıcısı</a>
+      <nav class="main-nav nav-links" aria-label="Primary Navigation">
+        <a href="#pathways" class="nav-link" data-i18n="nav.pathways">Təhsil Yolları</a>
+        <a href="#services" class="nav-link" data-i18n="nav.services">Xidmətlər</a>
+        <a href="#calculator" class="nav-link" data-i18n="nav.calculator">Qiymətləndirmə</a>
         <a href="#roadmap" class="nav-link" data-i18n="nav.roadmap">Yol Xəritəsi</a>
         <a href="#pricing" class="nav-link" data-i18n="nav.pricing">Paketlər</a>
-        <a href="#stories" class="nav-link" data-i18n="nav.stories">Uğur Hekayələri</a>
-        <a href="#faq" class="nav-link" data-i18n="nav.faq">Suallar (FAQ)</a>
-        <a href="#contact" class="nav-link" data-i18n="nav.contact">Əlaqə və Sənədlər</a>
+        <a href="#stories" class="nav-link" data-i18n="nav.stories">Uğurlar</a>
+        <a href="#faq" class="nav-link" data-i18n="nav.faq">FAQ</a>
+        <a href="#contact" class="nav-link" data-i18n="nav.contact">Əlaqə</a>
+
+        <!-- 4-Button Language Switcher & CTA inside Mobile Menu Drawer -->
+        <div class="mobile-drawer-footer">
+          <div class="lang-switcher mobile-lang-switcher" role="group" aria-label="Language Switcher">
+            <a href="/fa" class="lang-btn " data-lang="fa" title="فارسی (Persian)">
+              <span class="lang-flag">🇮🇷</span><span>FA</span>
+            </a>
+            <a href="/de" class="lang-btn " data-lang="de" title="Deutsch (German)">
+              <span class="lang-flag">🇩🇪</span><span>DE</span>
+            </a>
+            <a href="/en" class="lang-btn " data-lang="en" title="English">
+              <span class="lang-flag">🇬🇧</span><span>EN</span>
+            </a>
+            <a href="/az" class="lang-btn active" data-lang="az" title="Azərbaycan">
+              <span class="lang-flag">🇦🇿</span><span>AZ</span>
+            </a>
+          </div>
+          <button type="button" class="btn btn-primary mobile-drawer-cta" data-open-modal="consult-modal">
+            <span data-i18n="nav.cta_book">Pulsuz Məsləhət</span>
+          </button>
+        </div>
       </nav>
 
       <div class="header-controls">
-        <!-- 4-Language Switcher (FA | DE | EN | AZ) -->
-        <div class="lang-switcher" role="group" aria-label="Language Switcher">
-          <a href="/fa" class="lang-btn " data-lang="fa" id="lang-switch-fa" title="فارسی (Persian)">
-            <span class="lang-flag">🇮🇷</span><span>FA</span>
-          </a>
-          <a href="/de" class="lang-btn " data-lang="de" id="lang-switch-de" title="Deutsch (German)">
-            <span class="lang-flag">🇩🇪</span><span>DE</span>
-          </a>
-          <a href="/en" class="lang-btn " data-lang="en" id="lang-switch-en" title="English">
-            <span class="lang-flag">🇬🇧</span><span>EN</span>
-          </a>
-          <a href="/az" class="lang-btn active" data-lang="az" id="lang-switch-az" title="Azərbaycan">
-            <span class="lang-flag">🇦🇿</span><span>AZ</span>
-          </a>
+        <!-- Compact Accessible Language Dropdown Selector (🌐 FA ▾) -->
+        <div class="lang-dropdown" id="lang-dropdown">
+          <button type="button" class="lang-dropdown-toggle" id="lang-dropdown-btn" aria-haspopup="true" aria-expanded="false" aria-label="Select Language">
+            <span class="lang-globe-icon" aria-hidden="true">🌐</span>
+            <span class="lang-current-code" id="lang-current-code">AZ</span>
+            <span class="lang-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="menu" aria-label="Language Selector">
+            <a href="/fa" role="menuitem" class="lang-btn lang-dropdown-item " data-lang="fa" id="lang-switch-fa" title="فارسی (Persian)">
+              <span class="lang-flag">🇮🇷</span>
+              <span class="lang-item-name">فارسی</span>
+              <span class="lang-item-code">FA</span>
+            </a>
+            <a href="/de" role="menuitem" class="lang-btn lang-dropdown-item " data-lang="de" id="lang-switch-de" title="Deutsch (German)">
+              <span class="lang-flag">🇩🇪</span>
+              <span class="lang-item-name">Deutsch</span>
+              <span class="lang-item-code">DE</span>
+            </a>
+            <a href="/en" role="menuitem" class="lang-btn lang-dropdown-item " data-lang="en" id="lang-switch-en" title="English">
+              <span class="lang-flag">🇬🇧</span>
+              <span class="lang-item-name">English</span>
+              <span class="lang-item-code">EN</span>
+            </a>
+            <a href="/az" role="menuitem" class="lang-btn lang-dropdown-item active" data-lang="az" id="lang-switch-az" title="Azərbaycan">
+              <span class="lang-flag">🇦🇿</span>
+              <span class="lang-item-name">Azərbaycan</span>
+              <span class="lang-item-code">AZ</span>
+            </a>
+          </div>
         </div>
 
         <!-- Dark / Light Mode Toggle -->
@@ -206,10 +242,10 @@
         </button>
 
         <button type="button" class="btn btn-primary header-cta" data-open-modal="consult-modal" id="header-book-btn">
-          <span data-i18n="nav.cta_book">Konsultasiya Bron Et</span>
+          <span data-i18n="nav.cta_book">Pulsuz Məsləhət</span>
         </button>
 
-        <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Navigation Menu">
+        <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Navigation Menu" aria-expanded="false">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -1041,13 +1077,13 @@
         <div>
           <h3 class="footer-title" data-i18n="footer.col_links">Sürətli Keçidlər</h3>
           <div class="footer-links">
-            <a href="#pathways" data-i18n="nav.pathways">Təhsil İstiqamətləri</a>
-            <a href="#services" data-i18n="nav.services">Tam Xidmətlər</a>
-            <a href="#calculator" data-i18n="nav.calculator">Şans Hesablayıcısı</a>
+            <a href="#pathways" data-i18n="nav.pathways">Təhsil Yolları</a>
+            <a href="#services" data-i18n="nav.services">Xidmətlər</a>
+            <a href="#calculator" data-i18n="nav.calculator">Qiymətləndirmə</a>
             <a href="#roadmap" data-i18n="nav.roadmap">Yol Xəritəsi</a>
             <a href="#pricing" data-i18n="nav.pricing">Paketlər</a>
-            <a href="#faq" data-i18n="nav.faq">Suallar (FAQ)</a>
-            <a href="#contact" data-i18n="nav.contact">Əlaqə və Sənədlər</a>
+            <a href="#faq" data-i18n="nav.faq">FAQ</a>
+            <a href="#contact" data-i18n="nav.contact">Əlaqə</a>
           </div>
         </div>
 

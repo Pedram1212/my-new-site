@@ -586,12 +586,17 @@
     const descMeta = document.querySelector('meta[name="description"]');
     if (descMeta) descMeta.setAttribute('content', dict.meta.description);
 
-    // Update language switcher active pill
+    // Update language switcher active pill & compact dropdown current code
     document.querySelectorAll('.lang-btn').forEach((btn) => {
       const isMatch = btn.getAttribute('data-lang') === lang;
       btn.classList.toggle('active', isMatch);
       btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
     });
+
+    const langCodeEl = document.getElementById('lang-current-code');
+    if (langCodeEl) {
+      langCodeEl.textContent = lang.toUpperCase();
+    }
 
     // Update all static [data-i18n] text nodes
     document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -693,14 +698,56 @@
       { passive: true }
     );
 
+    // Close language dropdown on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const langDropdown = document.getElementById('lang-dropdown');
+        const langToggleBtn = document.getElementById('lang-dropdown-btn');
+        if (langDropdown && langDropdown.classList.contains('open')) {
+          langDropdown.classList.remove('open');
+          if (langToggleBtn) langToggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+
     // Global click delegation
     document.addEventListener('click', (e) => {
-      // Language button click
+      // Compact Language Dropdown Toggle
+      const langDropdownToggle = e.target.closest('#lang-dropdown-btn');
+      if (langDropdownToggle) {
+        e.preventDefault();
+        e.stopPropagation();
+        const langDropdown = document.getElementById('lang-dropdown');
+        if (langDropdown) {
+          const isOpen = langDropdown.classList.toggle('open');
+          langDropdownToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+        return;
+      }
+
+      // Close language dropdown when clicking outside
+      const langDropdown = document.getElementById('lang-dropdown');
+      if (langDropdown && langDropdown.classList.contains('open') && !e.target.closest('#lang-dropdown')) {
+        langDropdown.classList.remove('open');
+        const langToggleBtn = document.getElementById('lang-dropdown-btn');
+        if (langToggleBtn) langToggleBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      // Language button click (in dropdown or mobile drawer)
       const langBtn = e.target.closest('.lang-btn');
       if (langBtn) {
         e.preventDefault();
         const targetLang = langBtn.getAttribute('data-lang');
         setLanguage(targetLang, true);
+        if (langDropdown) {
+          langDropdown.classList.remove('open');
+          const langToggleBtn = document.getElementById('lang-dropdown-btn');
+          if (langToggleBtn) langToggleBtn.setAttribute('aria-expanded', 'false');
+        }
+        const header = document.getElementById('site-header');
+        if (header) header.classList.remove('mobile-open');
+        const mobBtn = document.getElementById('mobile-menu-btn');
+        if (mobBtn) mobBtn.setAttribute('aria-expanded', 'false');
         return;
       }
 
@@ -715,14 +762,19 @@
       const mobileBtn = e.target.closest('#mobile-menu-btn');
       if (mobileBtn) {
         const header = document.getElementById('site-header');
-        if (header) header.classList.toggle('mobile-open');
+        if (header) {
+          const isOpen = header.classList.toggle('mobile-open');
+          mobileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
         return;
       }
 
-      // Close mobile menu when clicking a nav link
-      if (e.target.closest('.nav-link')) {
+      // Close mobile menu when clicking a nav link or mobile drawer CTA
+      if (e.target.closest('.nav-link') || e.target.closest('.mobile-drawer-cta')) {
         const header = document.getElementById('site-header');
         if (header) header.classList.remove('mobile-open');
+        const mobBtn = document.getElementById('mobile-menu-btn');
+        if (mobBtn) mobBtn.setAttribute('aria-expanded', 'false');
       }
 
       // Pathway tab switching
